@@ -1,6 +1,16 @@
 @extends('layouts.admin')
 @section('content')
-
+<style>
+    .swal2-confirm.btn-lg,
+    .swal2-cancel.btn-lg {
+        font-size: 14px;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+    td, tr{
+        font-size: 14px;
+    }
+</style>
 <div class="main-content-inner">
     <div class="main-content-wrap">
         <div class="flex items-center flex-wrap justify-between gap20 mb-27">
@@ -66,40 +76,36 @@
                                     <img src="{{ asset('uploads/products/' . $product->image) }}" alt="{{ $product->name }}" class="image">
                                 </div>
                                 <div class="name">
-                                    <a href="#" class="body-title-2">Product6</a>
-                                    <div class="text-tiny mt-3">{{ $product->name }}</div>
+                                    <a href="#" class="body-title-2">{{ $product->name }}</a>
+                                    {{-- <div class="text-tiny mt-3">{{ $product->name }}</div> --}}
                                 </div>
                             </td>
                             <td>{{ $product->price }}</td>
                             <td>{{ $product->cost }}</td>
                             <td>{{ $product->SKU }}</td>
                             <td>{{ $product->category_id }}</td>
-                            <td>{{ $product->id }}</td> <!-- Replace product_id if not applicable -->
+                            <td>{{ $product->brand_id }}</td>
                             <td>{{ $product->featured }}</td>
                             <td>{{ $product->stock_status }}</td>
                             <td>{{ $product->quantity }}</td>
-                            <td>
+                            <th>
                                 <div class="list-icon-function">
-{{--                                     <a href="{{ route('admin.products', $product->id) }}" class="btn btn-sm btn-info" title="View">
-                                        <i class="fas fa-eye"></i>
-                                    </a> --}}
                                     <a href="{{ route('admin.edit.product', $product->id) }}">
                                         <div class="item edit">
-                                            <i class="icon-edit-3"></i>
+                                            <i class="fa-regular fa-pen-to-square"></i>
                                         </div>
                                     </a>
                                     <form action="{{ route('admin.delete.product', $product->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <div class="item text-danger delete">
-                                            <i class="icon-trash-2"></i>
+                                            <i class="fa-solid fa-trash-can"></i>
                                         </div>
                                     </form>
                                 </div>
-                            </td>
+                            </th>
                         </tr>
                     @endforeach
-
                     </tbody>
                 </table>
             </div>
@@ -123,9 +129,16 @@
             Swal.fire({
                 title: 'Are you sure?',
                 text: 'You want to delete this record?',
-                type: 'warning',
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn-lg',
+                    cancelButton: 'btn-lg'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     $(this).closest('form').submit();

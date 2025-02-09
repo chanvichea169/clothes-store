@@ -1,7 +1,7 @@
 @extends('layouts.admin')
 @section('content')
-<div class="main-content-inner">
 
+<div class="main-content-inner">
     <div class="main-content-wrap">
         <div class="tf-section-2 mb-30">
             <div class="flex gap20 flex-wrap-mobile">

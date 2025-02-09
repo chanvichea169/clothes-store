@@ -1,5 +1,10 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    .filled-heart {
+        color: orange;
+    }
+</style>
 <main class="pt-90">
     <div class="mb-md-1 pb-md-3"></div>
     <section class="product-single container">
@@ -9,7 +14,6 @@
             <div class="product-single__image">
                 <div class="swiper-container">
                   <div class="swiper-wrapper">
-
                     <div class="swiper-slide product-single__image-item">
                       <img loading="lazy" class="h-auto" src="{{ asset('uploads/products')}}/{{$product->image }}" width="674"
                         height="674" alt="" />
@@ -79,7 +83,7 @@
                 </svg></a>
             </div><!-- /.shop-acs -->
           </div>
-          <h1 class="product-single__name">{{ $product->status }}</h1>
+          <h1 class="product-single__name">{{ $product->name }}</h1>
           <div class="product-single__rating">
             <div class="reviews-group d-flex">
               <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
@@ -103,7 +107,7 @@
           <div class="product-single__price">
             <span class="current-price">
                 @if($product->price)
-                    <s>${{ $product->cost }}</s>${{ $product->price }}
+                    <s>${{ $product->cost }}</s><span style="color:red;"> ${{ $product->price }} </span>
                 @else
                 ${{ $product->price }}
                 @endif
@@ -129,10 +133,31 @@
             </div>
           </form>
           <div class="product-single__addtolinks">
-            <a href="#" class="menu-link menu-link_us-s add-to-wishlist"><svg width="16" height="16" viewBox="0 0 20 20"
-                fill="none" xmlns="http://www.w3.org/2000/svg">
-                <use href="#icon_heart" />
-              </svg><span>Add to Wishlist</span></a>
+
+            @if(Cart::instance('wishlist')->content()->where('id',$product->id)->count() > 0)
+            <form action="{{ route('wishlist.remove_from_wishlist', ['rowId' => Cart::instance('wishlist')->content()->where('id', $product->id)->first()->rowId]) }}" method="POST" id="frm-wishlist-remove">
+                @csrf
+                @method('DELETE')
+                <a href="javascript:void(0)" class="menu-link menu-link_us-s add-to-wishlist filled-heart" onclick="document.getElementById('frm-wishlist-remove').submit();"><svg width="16" height="16" viewBox="0 0 20 20"
+                    fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <use href="#icon_heart" />
+                </svg><span>Remove from Wishlist</span>
+                </a>
+            </form>
+            @else
+                <form action="{{route('wishlist.add_to_wishlist')}}" method="POST" id="wishlist-form">
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $product->id }}">
+                    <input type="hidden" name="name" value="{{ $product->name }}">
+                    <input type="hidden" name="price" value="{{ $product->price == '' ? $product->cost : $product->price }}">
+                    <input type="hidden" name="quantity" value="{{ $product->quantity }}">
+                    <a href="#" class="menu-link menu-link_us-s add-to-wishlist" onclick="document.getElementById('wishlist-form').submit();"><svg width="16" height="16" viewBox="0 0 20 20"
+                        fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <use href="#icon_heart" />
+                    </svg><span>Add to Wishlist</span>
+                    </a>
+                </form>
+            @endif
             <share-button class="share-button">
               <button class="menu-link menu-link_us-s to-share border-0 bg-transparent d-flex align-items-center">
                 <svg width="16" height="19" viewBox="0 0 16 19" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -397,63 +422,77 @@
           }'>
           <div class="swiper-wrapper">
             @foreach ($rproducts as $rproduct)
+              <div class="swiper-slide product-card">
+                <div class="pc__img-wrapper">
+                  <a href="{{ route('shop.details', ['product_slug' => $rproduct->slug]) }}">
+                    <img
+                      loading="lazy"
+                      src="{{ asset('uploads/products') }}/{{ $rproduct->image }}"
+                      width="330"
+                      height="400"
+                      alt="{{ $rproduct->name }}"
+                      class="pc__img">
 
-            <div class="swiper-slide product-card">
-              <div class="pc__img-wrapper">
-                <a href="{{ route('shop.details', ['product_slug'=> $rproduct->slug]) }}">
-                  <img loading="lazy" src="{{ asset('uploads/products')}}/{{$rproduct->image }}" width="330" height="400"
-                    alt="{{ $rproduct->name }}" class="pc__img">
+                    <!-- Display gallery images -->
+                    @foreach (explode(",", $rproduct->gallery) as $img)
+                      <img
+                        loading="lazy"
+                        src="{{ asset('uploads/products/thumbnails') }}/{{ $img }}"
+                        width="330"
+                        height="400"
+                        alt="{{ $rproduct->name }}"
+                        class="pc__img pc__img-second">
+                    @endforeach
+                  </a>
 
-                @foreach (explode(",", $rproduct->gallery) as $img)
-
-                <img loading="lazy" src="{{ asset('uploads/products/thumbnails')}}/{{$img }}" width="330" height="400"
-                  alt="{{ $rproduct->name }}" class="pc__img pc__img-second">
-                @endforeach
-                </a>
-                @if(Cart::instance('cart')->content()->where('id',$product->id)->count() > 0)
-                    <a href="{{ route('cart.index') }}" class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart btn-warning mb-3">Go to Cart</a>
-                @else
+                  <!-- Cart Button Logic -->
+                  @if(Cart::instance('cart')->content()->where('id', $rproduct->id)->count() > 0)
+                    <a
+                      href="{{ route('cart.index') }}"
+                      class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium btn-warning mb-3">
+                      Go to Cart
+                    </a>
+                  @else
                     <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
-                    @csrf
-                    <button
-                    class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart"
-                    data-aside="cartDrawer" title="Add To Cart">
-                    Add To Cart
-                    </button>
-                    <input type="hidden" name="id" value="{{ $product->id }}">
-                    <input type="hidden" name="name" value="{{ $product->name }}">
-                    <input type="hidden" name="quantity" value="{{ $product->quantity }}">
-                    <input type="hidden" name="price" value="{{ $product->price == '' ? $product->cost : $product->price }}">
+                      @csrf
+                      <button
+                        class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart"
+                        data-aside="cartDrawer"
+                        title="Add To Cart">
+                        Add To Cart
+                      </button>
+                      <input type="hidden" name="id" value="{{ $rproduct->id }}">
+                      <input type="hidden" name="name" value="{{ $rproduct->name }}">
+                      <input type="hidden" name="quantity" value="1"> <!-- Default quantity -->
+                      <input type="hidden" name="price" value="{{ $rproduct->price ?: $rproduct->cost }}">
                     </form>
-                @endif
-                  class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart js-open-aside"
-                  data-aside="cartDrawer" title="Add To Cart">Add To Cart</button>
-              </div>
-
-              <div class="pc__info position-relative">
+                  @endif
+                </div>
                 <p class="pc__category">{{ $rproduct->category->name }}</p>
-                <h6 class="pc__title"><a href="{{ route('shop.details', ['product_slug'=> $rproduct->slug]) }}">{{ $rproduct->name }}</a></h6>
+                <h6 class="pc__title"><a href="#">{{ $rproduct->name }}</a></h6>
+                <!-- Product Price -->
                 <div class="product-card__price d-flex">
                   <span class="money price">
                     @if($rproduct->price)
-                       <s>${{ $rproduct->cost }}</s>${{ $rproduct->price }}
+                      <s>${{ $rproduct->cost }}</s> <span style="color:red">${{ $rproduct->price }}</span>
                     @else
-                      ${{ $rproduct->price }}
+                      ${{ $rproduct->cost }}
                     @endif
                   </span>
                 </div>
 
-                <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
+                <!-- Wishlist Button -->
+                <button
+                  class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
                   title="Add To Wishlist">
                   <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <use href="#icon_heart" />
                   </svg>
                 </button>
               </div>
-            </div>
             @endforeach
+          </div>
 
-          </div><!-- /.swiper-wrapper -->
         </div><!-- /.swiper-container js-swiper-slider -->
 
         <div class="products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">

@@ -1,5 +1,20 @@
 @extends('layouts.app')
 @section('content')
+<style>
+    .brand-listt li, .category-listt li{
+        line-height: 40px;
+    }
+    .brand-listt li .chk-brand, .category-listt li .chk-category{
+        widows: 1rem;
+        height: 1rem;
+        color: #4e4e4e;
+        border: o.125rem solid currentColor;
+        border-radius: 0;
+    }
+    .filled-heart{
+        color: orange;
+    }
+</style>
 <main class="pt-90">
     <section class="shop-main container d-flex pt-4 pt-xl-5">
       <div class="shop-sidebar side-sticky bg-body" id="shopFilter">
@@ -36,7 +51,7 @@
                             {{ $category->name }}
                            </span>
                             <span class="text-right float-end">
-                                {{ $category->products->count() }}
+                                {{ $category->product->count() }}
                             </span>
                         </li>
                     @endforeach
@@ -139,7 +154,7 @@
                                 {{ $brand->name }}
                             </span>
                             <span class="text-right float-end">
-                              {{ $brand->products->count() }}
+                              {{ $brand->product->count() }}
                             </span>
                         </li>
                     @endforeach
@@ -394,13 +409,31 @@
                   </div>
                   <span class="reviews-note text-lowercase text-secondary ms-1">8k+ reviews</span>
                 </div>
-
-                <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
-                  title="Add To Wishlist">
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <use href="#icon_heart" />
-                  </svg>
-                </button>
+                @if(Cart::instance('wishlist')->content()->where('id',$product->id)->count() > 0)
+                <form action="{{ route('wishlist.remove_from_wishlist', ['rowId' => Cart::instance('wishlist')->content()->where('id', $product->id)->first()->rowId]) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist filled-heart" title="Remove From Wishlist">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <use href="#icon_heart" />
+                        </svg>
+                    </button>
+                </form>
+                @else
+                    <form action="{{route('wishlist.add_to_wishlist')}}" method="POST" id="wishlist-form">
+                        @csrf
+                        <input type="hidden" name="id" value="{{ $product->id }}">
+                        <input type="hidden" name="name" value="{{ $product->name }}">
+                        <input type="hidden" name="price" value="{{ $product->price == '' ? $product->cost : $product->price }}">
+                        <input type="hidden" name="quantity" value="{{ $product->quantity }}">
+                        <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
+                        title="Add To Wishlist">
+                        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <use href="#icon_heart" />
+                        </svg>
+                        </button>
+                    </form>
+                  @endif
               </div>
             </div>
         </div>

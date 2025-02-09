@@ -318,10 +318,10 @@
                 <a href="{{ route('cart.index') }}" class="navigation__link">Cart</a>
                 </li>
                 <li class="navigation__item">
-                <a href="about.html" class="navigation__link">About</a>
+                <a href="{{ route('about.index') }}" class="navigation__link">About</a>
                 </li>
                 <li class="navigation__item">
-                <a href="contact.html" class="navigation__link">Contact</a>
+                <a href="{{ route('contact.index') }}" class="navigation__link">Contact</a>
                 </li>
             </ul>
             </div>
@@ -407,10 +407,10 @@
                 <a href="{{ route('cart.index') }}" class="navigation__link">Cart</a>
                 </li>
                 <li class="navigation__item">
-                <a href="about.html" class="navigation__link">About</a>
+                <a href="{{ route('about.index') }}" class="navigation__link">About</a>
                 </li>
                 <li class="navigation__item">
-                <a href="contact.html" class="navigation__link">Contact</a>
+                <a href="{{ route('contact.index') }}" class="navigation__link">Contact</a>
                 </li>
             </ul>
             </nav>
@@ -482,10 +482,13 @@
                     </div>
             @endguest
 
-            <a href="wishlist.html" class="header-tools__item">
+            <a href="{{ route('wishlist.index') }}" class="header-tools__item header-tools__cart">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <use href="#icon_heart" />
                 </svg>
+                @if(Cart::instance('wishlist')->content()->count() > 0)
+                    <span class="cart-amount d-block position-absolute js-cart-items-count">{{ Cart::instance('wishlist')->content()->count() }}</span>
+                @endif
             </a>
 
             <a href="{{ route('cart.index') }}" class="header-tools__item header-tools__cart">
@@ -614,7 +617,7 @@
 
         <div class="footer-bottom">
         <div class="container d-md-flex align-items-center">
-            <span class="footer-copyright me-auto">©2024 Surfside Media</span>
+            <span class="footer-copyright me-auto">©2024 Chann Vichea</span>
             <div class="footer-settings d-md-flex align-items-center">
             <a href="privacy-policy.html">Privacy Policy</a> &nbsp;|&nbsp; <a href="terms-conditions.html">Terms &amp;
                 Conditions</a>

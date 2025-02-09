@@ -127,7 +127,7 @@
                                     </a>
                                     <ul class="sub-menu">
                                         <li class="sub-menu-item">
-                                            <a href="orders.html" class="">
+                                            <a href="{{ route('order.index') }}" class="">
                                                 <div class="text">Orders</div>
                                             </a>
                                         </li>
@@ -145,7 +145,7 @@
                                     </a>
                                 </li>
                                 <li class="menu-item">
-                                    <a href="coupons.html" class="">
+                                    <a href="{{ route('admin.coupons') }}" class="">
                                         <div class="icon"><i class="icon-grid"></i></div>
                                         <div class="text">Coupns</div>
                                     </a>
@@ -169,7 +169,7 @@
                                     <form method="POST" action="{{ route('logout') }}" id="logout-form">
                                         @csrf
                                         <a href="{{ route('logout') }}" class="" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                            <div class="icon me-2"><i class="fas fa-sign-out-alt"></i></div>
+                                            <div class="icon me-2"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
                                             <div class="text">logout</div>
                                         </a>
                                     </form>
@@ -183,11 +183,11 @@
                     <div class="header-dashboard">
                         <div class="wrap">
                             <div class="header-left">
-                                <a href="index-2.html">
+{{--                                 <a href="{{ route('admin.index') }}" id="site-logo-inner">
                                     <img class="" id="logo_header_mobile" alt="" src="images/logo/logo.png"
                                         data-light="images/logo/logo.png" data-dark="images/logo/logo.png"
                                         data-width="154px" data-height="52px" data-retina="images/logo/logo.png">
-                                </a>
+                                </a> --}}
                                 <div class="button-show-hide">
                                     <i class="icon-menu-left"></i>
                                 </div>
@@ -461,7 +461,7 @@
                     <div class="main-content">
                         @yield('content')
                         <div class="bottom-page">
-                            <div class="body-text">Copyright © 2024 SurfsideMedia</div>
+                            <div class="body-text">Copyright © 2025 Chann Vichea</div>
                         </div>
                     </div>
 

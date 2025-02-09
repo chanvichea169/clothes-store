@@ -1,6 +1,16 @@
 @extends('layouts.admin')
 @section('content')
-
+<style>
+    .swal2-confirm.btn-lg,
+    .swal2-cancel.btn-lg {
+        font-size: 14px;
+        padding: 10px 20px;
+        border-radius: 5px;
+    }
+    td, tr{
+        font-size: 14px;
+    }
+</style>
 <div class="main-content-inner">
     <div class="main-content-wrap">
         <div class="flex items-center flex-wrap justify-between gap20 mb-27">
@@ -70,14 +80,14 @@
 
                                             <a href="{{ route('admin.edit.brand', $brand->id) }}">
                                                 <div class="item edit">
-                                                    <i class="icon-edit-3">edit</i>
+                                                    <i class="fa-regular fa-pen-to-square"></i>
                                                 </div>
                                             </a>
                                             <form action="{{ route('admin.delete.brand', $brand->id) }}" method="POST">
                                                 @csrf
                                                 @method('DELETE')
                                                 <div class="item text-danger delete">
-                                                    <i class="icon-trash-2">delete</i>
+                                                    <i class="fa-solid fa-trash-can"></i>
                                                 </div>
                                             </form>
                                         </div>
@@ -106,9 +116,16 @@
             Swal.fire({
                 title: 'Are you sure?',
                 text: 'You want to delete this record?',
-                type: 'warning',
+                icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Delete',
+                cancelButtonText: 'Cancel',
+                customClass: {
+                    confirmButton: 'btn-lg',
+                    cancelButton: 'btn-lg'
+                }
             }).then((result) => {
                 if (result.isConfirmed) {
                     $(this).closest('form').submit();

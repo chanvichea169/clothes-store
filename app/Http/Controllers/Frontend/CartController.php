@@ -3,8 +3,15 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
+use App\Models\Address;
+use App\Models\Coupon;
+use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Session;
 use Surfsidemedia\Shoppingcart\Facades\Cart;
 
 class CartController extends Controller
@@ -48,4 +55,5 @@ class CartController extends Controller
         Cart::instance('cart')->destroy();
         return redirect()->back();
     }
+
 }
