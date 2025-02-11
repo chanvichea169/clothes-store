@@ -105,9 +105,7 @@
                                     <img src="{{ asset('uploads/products/thumbnails') }}/{{ $item->product->image }}" alt="{{ $item->product->name }}" class="image">
                                 </div>
                                 <div class="name">
-                                    <a href="{{ route('admin.products', ['product_slug'=>$item->product->slug]) }}" target="_blank"
-                                        class="body-title-2">{{ $item->product->name }}</a>
-                                </div>
+                                    <a href="{{ route('admin.products', ['product_slug'=>$item->product->slug]) }}" target="_blank"                                </div>
                             </td>
                             <td class="text-center">${{ $item->price }}</td>
                             <td class="text-center">{{ $item->quantity }}</td>
