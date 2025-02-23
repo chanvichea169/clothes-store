@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('frontend.layouts.master')
+@section('title', '- OrderDetails')
 @section('content')
 <head>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
@@ -127,7 +128,10 @@
                         </div>
                     </div>
                     <div class="table-responsive">
-                        <table class="table table-bordered">
+                        @if(Session::has('status'))
+                        <p class="alert alert-success">{{ Session::get('status') }}</p>
+                        @endif
+                        <table class="table table-bordered table-striped table-transaction">
                             <tr>
                             <th>Order No</th>
                                 <td>{{ $order->id }}</td>
@@ -145,7 +149,7 @@
                             </tr>
                             <tr>
                                 <th>Order Status</th>
-                                <td colspan="5">
+                                <td>
                                     @if($order->status == 'delivered')
                                         <span class="badge bg-success">Delivered</span>
                                     @elseif($order->status == 'canceled')
@@ -192,12 +196,22 @@
                             <tbody>
                                 @foreach($orderItems as $item)
                                 <tr>
-                                    <td class="pname">
-                                        <div class="image">
-                                            <img src="{{ asset('uploads/products/thumbnails') }}/{{ $item->product->image }}" alt="{{ $item->product->name }}" class="image">
+                                    <td class="text-center">
+                                        <div style="display: flex; align-items: center; gap: 10px;">
+
+                                            <div class="image">
+                                                <img src="{{ asset('uploads/products/thumbnails/' . $item->product->image) }}"
+                                                     alt="{{ $item->product->name }}"
+                                                     class="image"
+                                                     style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
+                                            </div>
+
+                                            <div class="name">
+                                                <a href="{{ route('admin.products', ['product_slug' => $item->product->slug]) }}" target="_blank">
+                                                    <strong>{{ $item->product->name }}</strong>
+                                                </a>
+                                            </div>
                                         </div>
-                                        <div class="name">
-                                            <a href="{{ route('admin.products', ['product_slug'=>$item->product->slug]) }}" target="_blank"                                </div>
                                     </td>
                                     <td class="text-center">${{ $item->price }}</td>
                                     <td class="text-center">{{ $item->quantity }}</td>
@@ -261,6 +275,7 @@
                                 <th>Status</th>
                                 <td>
                                     @if($transaction->status == 'approved')
+                                        <span class="badge bg-success">Delivered</span>
                                         <span class="badge badge-success">Approved</span>
                                     @elseif($transaction->status == 'refunded')
                                         <span class="badge badge-warning">Refunded</span>
@@ -274,8 +289,47 @@
                         </tbody>
                     </table>
                 </div>
+                @if($order->status == 'ordered')
+                <div class="wg-box mt-5 text-right">
+                    <form action="{{ route('user.order.cancel', $order->id) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+                        <input type="hidden" name="order_id" value="{{ $order->id }}">
+                        <button type="button" class="btn btn-danger cancel-order">Cancel Order</button>
+                    </form>
+                </div>
+                @endif
             </div>
         </div>
         </section>
     </main>
 @endsection
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $(document).ready(function() {
+        $('.cancel-order').on('click', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You want to cancel Order this record?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No',
+                customClass: {
+                    confirmButton: 'btn-lg',
+                    cancelButton: 'btn-lg'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(this).closest('form').submit();
+                }
+            });
+        });
+    });
+</script>
+@endpush

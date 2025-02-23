@@ -1,4 +1,5 @@
-@extends('layouts.admin')
+@extends('admin.layouts.master')
+@section('title', '- Products')
 @section('content')
 <style>
     .swal2-confirm.btn-lg,
@@ -58,6 +59,7 @@
                             <th>Price</th>
                             <th>SalePrice</th>
                             <th>SKU</th>
+                            <th>Size</th>
                             <th>Category</th>
                             <th>Brand</th>
                             <th>Featured</th>
@@ -83,6 +85,7 @@
                             <td>{{ $product->price }}</td>
                             <td>{{ $product->cost }}</td>
                             <td>{{ $product->SKU }}</td>
+                            <td>{{ $product->size }}</td>
                             <td>{{ $product->category_id }}</td>
                             <td>{{ $product->brand_id }}</td>
                             <td>{{ $product->featured }}</td>
@@ -112,13 +115,14 @@
 
             <div class="divider"></div>
             <div class="flex items-center justify-between flex-wrap gap10 wgp-pagination">
-
-
+                {{ $products->links('pagination::bootstrap-5') }}
             </div>
         </div>
     </div>
 </div>
 
+
+@endsection
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -148,5 +152,3 @@
     });
 </script>
 @endpush
-
-@endsection

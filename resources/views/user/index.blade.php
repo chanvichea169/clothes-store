@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('frontend.layouts.master')
+@section('title', '- UserInformation')
 @section('content')
 <main class="pt-90">
     <div class="mb-4 pb-4"></div>

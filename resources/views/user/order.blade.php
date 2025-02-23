@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('frontend.layouts.master')
+@section('title', '- Orders')
 @section('content')
     <style>
         .table> :not(caption)>tr>th {
@@ -73,15 +74,25 @@
                                     <td class="text-center">${{ $order->total }}</td>
 
                                     <td class="text-center">
-                                        <span class="badge bg-danger">{{ $order->status }}</span>
+                                        @if($order->status == 'delivered')
+                                        <span class="badge bg-success">Delivered</span>
+                                        @elseif($order->status == 'canceled')
+                                            <span class="badge bg-danger">Canceled</span>
+                                        @elseif($order->status == 'shipped')
+                                            <span class="badge bg-info">Shipped</span>
+                                        @elseif($order->status == 'processing')
+                                            <span class="badge bg-primary">Processing</span>
+                                        @else
+                                            <span class="badge bg-warning">Ordered</span>
+                                        @endif
                                     </td>
                                     <td class="text-center">{{ $order->created_at }}</td>
                                     <td class="text-center">{{ $order->orderItems->count() }}</td>
-                                    <td>{{ $order->deliverd_date }}</td>
+                                    <td class="text-center">{{ $order->deliverd_date }}</td>
                                     <td class="text-center">
                                         <a href="{{ route('user.order.details', $order->id) }}">
                                         <div class="list-icon-function view-icon">
-                                            <div class="item eye" style="color: blue;font-size:16px;">
+                                            <div class="item eye" style="color: blue;font-size:18px;">
                                                 <i class="fa fa-eye"></i>
                                                 view
                                             </div>

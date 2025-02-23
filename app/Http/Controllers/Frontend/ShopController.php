@@ -14,12 +14,14 @@ class ShopController extends Controller
     {
         $size = $request->query('size') ? $request->query('size') : 12;
         $o_column = "";
-        $o_order =  "";
+        $o_order = "";
         $order = $request->query('order') ? $request->query('order') : -1;
         $f_brands = $request->query('brands');
         $f_categories = $request->query('categories');
+        $f_colors = $request->query('SKU');
         $min_price = $request->query('min') ? $request->query('min') : 1;
         $max_price = $request->query('max') ? $request->query('max') : 700;
+
         switch ($order) {
             case 1:
                 $o_column = "created_at";
@@ -41,8 +43,12 @@ class ShopController extends Controller
                 $o_column = "id";
                 $o_order = "desc";
         }
+
         $categories = Category::orderBy('name', 'asc')->get();
         $brands = Brand::orderBy('name', 'asc')->get();
+
+        $colors = Product::select('SKU')->distinct()->get();
+
         $products = Product::
                     where(function ($query) use ($f_brands) {
                         $query->whereIn('brand_id', explode(',', $f_brands))->orWhereRaw("'".$f_brands."'=''");
@@ -50,12 +56,18 @@ class ShopController extends Controller
                     where(function ($query) use ($f_categories) {
                         $query->whereIn('category_id', explode(',', $f_categories))->orWhereRaw("'".$f_categories."'=''");
                     })->
+                    where(function ($query) use ($f_colors) {
+                        $query->whereIn('SKU', explode(',', $f_colors))->orWhereRaw("'".$f_colors."'=''");
+                    })->
                     where(function ($query) use ($min_price, $max_price) {
                         $query->whereBetween('price', [$min_price, $max_price])
-                        ->orWhereBetween('cost', [$min_price, $max_price]);
-                    })->orderBy($o_column, $o_order)->paginate($size);
-        return view('frontend.shop.index', compact('products', 'size', 'order', 'brands', 'f_brands', 'categories', 'f_categories', 'min_price', 'max_price'));
+                              ->orWhereBetween('cost', [$min_price, $max_price]);
+                    })->
+                    orderBy($o_column, $o_order)->paginate($size);
+
+        return view('frontend.shop.index', compact('products', 'size', 'order', 'brands', 'f_brands', 'categories', 'f_categories', 'min_price', 'max_price', 'f_colors', 'colors'));
     }
+
 
     public function product_datails($product_slug)
     {

@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('frontend.layouts.master')
+@section('title', '- Cart')
 @section('content')
 <style>
     .text-success {

@@ -1,9 +1,10 @@
-@extends('layouts.admin')
+@extends('admin.layouts.master')
+@section('title', ' - Orders')
 @section('content')
 <style>
    td, th {
-        font-size: 12px !important;
-        }
+        font-size: 14px !important;
+    }
 </style>
 <div class="main-content-inner">
     <div class="main-content-wrap">
@@ -41,7 +42,7 @@
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
                     <table class="table table-striped table-bordered">
-                        <thead>
+                        <thead style="height:40px;">
                             <tr>
                                 <th style="width:70px">OrderNo</th>
                                 <th class="text-center">Name</th>
@@ -54,7 +55,7 @@
                                 <th class="text-center">Order Date</th>
                                 <th class="text-center">Total Items</th>
                                 <th class="text-center">Delivered On</th>
-                                <th></th>
+                                <th class="text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -66,21 +67,31 @@
                                 <td class="text-center">${{ $order->subtotal }}</td>
                                 <td class="text-center">${{ $order->tax }}</td>
                                 <td class="text-center">${{ $order->total }}</td>
-
-                                <td class="text-center">{{ $order->status }}</td>
+                                <td class="text-center">
+                                    @if($order->status == 'delivered')
+                                        <span class="badge bg-success">Delivered</span>
+                                    @elseif($order->status == 'canceled')
+                                        <span class="badge bg-danger">Canceled</span>
+                                    @elseif($order->status == 'shipped')
+                                        <span class="badge bg-info">Shipped</span>
+                                    @elseif($order->status == 'processing')
+                                        <span class="badge bg-primary">Processing</span>
+                                    @else
+                                        <span class="badge bg-warning">Ordered</span>
+                                    @endif
+                                </td>
                                 <td class="text-center">{{ $order->created_at }}</td>
                                 <td class="text-center">{{ $order->orderItems->count() }}</td>
                                 <td class="text-center">{{ $order->delivered_date }}</td>
-                                <td></td>
-                                <td class="text-center">
+                                <th class="text-center">
                                     <a href="{{ route('order.details',['order_id'=>$order->id]) }}">
                                         <div class="list-icon-function view-icon">
-                                            <div class="item eye">
+                                            <div class="item eye" style="font-size: 16px; margin-left:40px">
                                                 <i class="fa-solid fa-eye fa-sm"></i> view
                                             </div>
                                         </div>
                                     </a>
-                                </td>
+                                </th>
                             </tr>
                             @endforeach
                         </tbody>

@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('frontend.layouts.master')
+@section('title', '- Shop')
 @section('content')
 <style>
     .brand-listt li, .category-listt li{
@@ -61,41 +62,38 @@
           </div>
         </div>
 
-
         <div class="accordion" id="color-filters">
-          <div class="accordion-item mb-4 pb-3">
-            <h5 class="accordion-header" id="accordion-heading-1">
-              <button class="accordion-button p-0 border-0 fs-5 text-uppercase" type="button" data-bs-toggle="collapse"
-                data-bs-target="#accordion-filter-2" aria-expanded="true" aria-controls="accordion-filter-2">
-                Color
-                <svg class="accordion-button__icon type2" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
-                  <g aria-hidden="true" stroke="none" fill-rule="evenodd">
-                    <path
-                      d="M5.35668 0.159286C5.16235 -0.053094 4.83769 -0.0530941 4.64287 0.159286L0.147611 5.05963C-0.0492049 5.27473 -0.049205 5.62357 0.147611 5.83813C0.344427 6.05323 0.664108 6.05323 0.860924 5.83813L5 1.32706L9.13858 5.83867C9.33589 6.05378 9.65507 6.05378 9.85239 5.83867C10.0492 5.62357 10.0492 5.27473 9.85239 5.06018L5.35668 0.159286Z" />
-                  </g>
-                </svg>
-              </button>
-            </h5>
-            <div id="accordion-filter-2" class="accordion-collapse collapse show border-0"
-              aria-labelledby="accordion-heading-1" data-bs-parent="#color-filters">
-              <div class="accordion-body px-0 pb-0">
-                <div class="d-flex flex-wrap">
-                  <a href="#" class="swatch-color js-filter" style="color: #0a2472"></a>
-                  <a href="#" class="swatch-color js-filter" style="color: #d7bb4f"></a>
-                  <a href="#" class="swatch-color js-filter" style="color: #282828"></a>
-                  <a href="#" class="swatch-color js-filter" style="color: #b1d6e8"></a>
-                  <a href="#" class="swatch-color js-filter" style="color: #9c7539"></a>
-                  <a href="#" class="swatch-color js-filter" style="color: #d29b48"></a>
-                  <a href="#" class="swatch-color js-filter" style="color: #e6ae95"></a>
-                  <a href="#" class="swatch-color js-filter" style="color: #d76b67"></a>
-                  <a href="#" class="swatch-color swatch_active js-filter" style="color: #bababa"></a>
-                  <a href="#" class="swatch-color js-filter" style="color: #bfdcc4"></a>
+            <div class="accordion-item mb-4 pb-3">
+                <h5 class="accordion-header" id="accordion-heading-1">
+                    <button class="accordion-button p-0 border-0 fs-5 text-uppercase" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#accordion-filter-2" aria-expanded="true" aria-controls="accordion-filter-2">
+                        Color
+                        <svg class="accordion-button__icon type2" viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg">
+                            <g aria-hidden="true" stroke="none" fill-rule="evenodd">
+                                <path
+                                    d="M5.35668 0.159286C5.16235 -0.053094 4.83769 -0.0530941 4.64287 0.159286L0.147611 5.05963C-0.0492049 5.27473 -0.049205 5.62357 0.147611 5.83813C0.344427 6.05323 0.664108 6.05323 0.860924 5.83813L5 1.32706L9.13858 5.83867C9.33589 6.05378 9.65507 6.05378 9.85239 5.83867C10.0492 5.62357 10.0492 5.27473 9.85239 5.06018L5.35668 0.159286Z" />
+                            </g>
+                        </svg>
+                    </button>
+                </h5>
+                <div id="accordion-filter-2" class="accordion-collapse collapse show border-0"
+                    aria-labelledby="accordion-heading-1" data-bs-parent="#color-filters">
+                    <div class="accordion-body px-0 pb-0">
+                        <div class="d-flex flex-wrap">
+                            <form id="color-filter-form">
+                                <input type="hidden" id="SKU" name="SKU" value="">
+                                @foreach ($colors as $color)
+                                    <a href="#" class="swatch-color js-filter"
+                                    style="color: {{ $color->SKU }}; width: 30px; height: 30px; display: inline-block; border-radius: 50%; margin: 5px; border: 2px solid #ddd;"
+                                    data-color="{{ $color->SKU }}">
+                                    </a>
+                                @endforeach
+                            </form>
+                        </div>
+                    </div>
                 </div>
-              </div>
             </div>
-          </div>
         </div>
-
 
         <div class="accordion" id="size-filters">
           <div class="accordion-item mb-4 pb-3">
@@ -383,7 +381,7 @@
                 <div class="product-card__price d-flex">
                   <span class="money price">
                     @if($product->price)
-                       <s>${{ $product->cost }}</s>${{ $product->price }}
+                       <s>${{ $product->cost }}</s><span style="color: red;">${{ $product->price }}</span>
                     @else
                       ${{ $product->price }}
                     @endif
@@ -433,7 +431,7 @@
                         </svg>
                         </button>
                     </form>
-                  @endif
+                @endif
               </div>
             </div>
         </div>
@@ -457,7 +455,6 @@
     <input type="hidden" name="max" id="MaxPrice" value="{{ $max_price }}" />
   </form>
 @endsection
-
 @push('scripts')
 <script>
     $(function() {
@@ -503,6 +500,28 @@
             }, 2000);
         });
 
+        $(document).ready(function () {
+            $(document).on("click", ".swatch-color", function (event) {
+            event.preventDefault();
+
+            let selectedColor = $(this).data("color");
+            let currentColors = $("#SKU").val() ? $("#SKU").val().split(",") : [];
+
+            if (currentColors.includes(selectedColor)) {
+                currentColors = currentColors.filter(color => color !== selectedColor);
+                $(this).removeClass("active");
+            } else {
+                currentColors.push(selectedColor);
+                $(this).addClass("active");
+            }
+
+            $("#SKU").val(currentColors.join(","));
+            $("#color-filter-form").submit();
+            });
+        });
+
+
     });
 </script>
 @endpush
+

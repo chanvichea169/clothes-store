@@ -1,4 +1,5 @@
-@extends('layouts.app')
+@extends('frontend.layouts.master')
+@section('title', '- Wishlist')
 @section('content')
 
 <main class="pt-90">
@@ -6,21 +7,21 @@
     <section class="shop-checkout container">
       <h2 class="page-title">Wishlist</h2>
       <div class="checkout-steps">
-        <a href="shop_cart.html" class="checkout-steps__item active">
+        <a href="javascript:void(0)" class="checkout-steps__item active">
           <span class="checkout-steps__item-number">01</span>
           <span class="checkout-steps__item-title">
             <span>Shopping Bag</span>
             <em>Manage Your Items List</em>
           </span>
         </a>
-        <a href="shop_checkout.html" class="checkout-steps__item">
+        <a href="javascript:void(0)" class="checkout-steps__item">
           <span class="checkout-steps__item-number">02</span>
           <span class="checkout-steps__item-title">
             <span>Shipping and Checkout</span>
             <em>Checkout Your Items List</em>
           </span>
         </a>
-        <a href="shop_order_complete.html" class="checkout-steps__item">
+        <a href="javascript:void(0)" class="checkout-steps__item">
           <span class="checkout-steps__item-number">03</span>
           <span class="checkout-steps__item-title">
             <span>Confirmation</span>

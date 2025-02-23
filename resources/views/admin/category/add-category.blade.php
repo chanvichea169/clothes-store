@@ -1,4 +1,5 @@
-@extends('layouts.admin')
+@extends('admin.layouts.master')
+@section('title', ' - Add_Category')
 @section('content')
 
 <div class="main-content-inner">

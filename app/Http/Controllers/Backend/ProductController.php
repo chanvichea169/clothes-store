@@ -42,6 +42,7 @@ class ProductController extends Controller
             'price' => 'required',
             'cost' => 'required',
             'SKU' => 'required',
+            'size' => 'required',
             'stock_status' => 'required',
             'featured' => 'required',
             'quantity' => 'required',
@@ -49,10 +50,9 @@ class ProductController extends Controller
             'category_id' => 'required',
             'brand_id' => 'required',
             'gallery' => 'array',
-            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Gallery validation
+            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        // Create Product
         $product = new Product();
         $product->name = $request->name;
         $product->slug = Str::slug($request->name);
@@ -60,6 +60,7 @@ class ProductController extends Controller
         $product->status = $request->status;
         $product->price = $request->price;
         $product->cost = $request->cost;
+        $product->size = $request->size;
         $product->SKU = $request->SKU;
         $product->stock_status = $request->stock_status;
         $product->featured = $request->featured;
@@ -125,12 +126,13 @@ class ProductController extends Controller
             'price' => 'required',
             'cost' => 'required',
             'SKU' => 'required',
+            'size' => 'required',
             'stock_status' => 'required',
             'featured' => 'required',
             'quantity' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'gallery' => 'array',
-            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Gallery validation
+            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'category_id' => 'required',
             'brand_id' => 'required',
         ]);
@@ -143,6 +145,7 @@ class ProductController extends Controller
         $product->price = $request->price;
         $product->cost = $request->cost;
         $product->SKU = $request->SKU;
+        $product->size = $request->size;
         $product->stock_status = $request->stock_status;
         $product->featured = $request->featured;
         $product->quantity = $request->quantity;

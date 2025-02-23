@@ -1,4 +1,5 @@
-@extends('layouts.admin')
+@extends('admin.layouts.master')
+@section('title', '- Order_Details')
 @section('content')
 <style>
     .table-transaction>tbody>tr:nth-of-type(odd) {
@@ -22,6 +23,14 @@
                     <i class="icon-chevron-right"></i>
                 </li>
                 <li>
+                    <a href="{{ route('order.index') }}">
+                        <div class="text-tiny">Order</div>
+                    </a>
+                </li>
+                <li>
+                    <i class="icon-chevron-right"></i>
+                </li>
+                <li>
                     <div class="text-tiny">Order Details</div>
                 </li>
             </ul>
@@ -32,9 +41,12 @@
                 <div class="wg-filter flex-grow">
                     <h5>Order Details</h5>
                 </div>
-                <a class="tf-button style-1 w208" href="{{ route('order.index') }}">Back</a>
+                <a class="tf-button style-1 w208 btn-sm" href="{{ route('order.index') }}">Back</a>
             </div>
             <div class="table-responsive">
+                @if(Session::has('status'))
+                    <p class="alert alert-success">{{ Session::get('status') }}</p>
+                @endif
                 <table class="table table-striped table-bordered">
                     <tr>
                     <th>Order No</th>
@@ -47,13 +59,13 @@
                     <th>Order Date</th>
                         <td>{{ $order->created_at }}</td>
                         <th>Delivered Date</th>
-                        <td>{{ $order->deliverd_date }}</td>
+                        <td>{{ $order->delivered_date }}</td>
                         <th>Canceled Date</th>
                         <td>{{ $order->canceled_date }}</td>
                     </tr>
                     <tr>
                         <th>Order Status</th>
-                        <td colspan="5">
+                        <td>
                             @if($order->status == 'delivered')
                                 <span class="badge bg-success">Delivered</span>
                             @elseif($order->status == 'canceled')
@@ -105,7 +117,13 @@
                                     <img src="{{ asset('uploads/products/thumbnails') }}/{{ $item->product->image }}" alt="{{ $item->product->name }}" class="image">
                                 </div>
                                 <div class="name">
-                                    <a href="{{ route('admin.products', ['product_slug'=>$item->product->slug]) }}" target="_blank"                                </div>
+                                    <a href="{{ route('admin.products', ['product_slug'=>$item->product->slug]) }}" target="_blank" >
+                                </div>
+                                <div class="name">
+                                    <a href="{{ route('admin.products', ['product_slug' => $item->product->slug]) }}" target="_blank">
+                                        <strong>{{ $item->product->name }}</strong>
+                                    </a>
+                                </div>
                             </td>
                             <td class="text-center">${{ $item->price }}</td>
                             <td class="text-center">{{ $item->quantity }}</td>
@@ -137,21 +155,21 @@
             <h5>Shipping Address</h5>
             <div class="my-account__address-item col-md-6">
                 <div class="my-account__address-item__detail">
-                    <p>{{ $order->name }}</p>
-                    <p>{{ $order->address }}</p>
-                    <p>{{ $order->locality }}</p>
-                    <p>{{ $order->city }}</p>
-                    <p>{{ $order->landkmark }}</p>
-                    <p>{{ $order->zip }}</p>
-                    <br>
-                    <p>Mobile : {{ $order->phone }}</p>
+                        <p>{{ $order->name }}</p>
+                        <p>{{ $order->address }}</p>
+                        <p>{{ $order->locality }}</p>
+                        <p>{{ $order->city }}</p>
+                        <p>{{ $order->landkmark }}</p>
+                        <p>{{ $order->zip }}</p>
+                        <br>
+                        <p>Mobile : {{ $order->phone }}</p>
                 </div>
             </div>
         </div>
 
         <div class="wg-box mt-5">
             <h5>Transactions</h5>
-            <table class="table table-striped table-bordered table-transaction">
+            <table class="table table-striped table-bordered">
                 <tbody>
                     <tr>
                         <th>Subtotal</th>
@@ -169,7 +187,7 @@
                         <th>Status</th>
                         <td>
                             @if($transaction->status == 'approved')
-                                <span class="badge badge-success">Approved</span>
+                                <span class="badge bg-success">Approved</span>
                             @elseif($transaction->status == 'refunded')
                                 <span class="badge badge-warning">Refunded</span>
                             @elseif($transaction->status == 'declined')
@@ -181,6 +199,28 @@
                     </tr>
                 </tbody>
             </table>
+        </div>
+        <div class="wg-box mt-5">
+            <h5>Update Order Status</h5>
+            <form action="{{ route('update.order.status', $order->id)}} " method="POST">
+                @csrf
+                @method('PUT')
+                <input type="hidden" name="order_id" value="{{ $order->id }}">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="select">
+                            <select name="order_status" id="order_status">
+                                <option value="ordered" {{ $order->status == 'ordered' ? "selected":"" }}>Ordered</option>
+                                <option value="delivered" {{ $order->status == 'delivered' ? "delivered":"" }}>Delivered</option>
+                                <option value="canceled" {{ $order->status == 'canceled' ? "canceled":"" }}>Canceled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-primary tf-button w208">Update Status</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

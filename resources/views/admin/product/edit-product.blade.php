@@ -1,4 +1,5 @@
-@extends('layouts.admin')
+@extends('admin.layouts.master')
+@section('title', ' - Edit_Product')
 @section('content')
 <!-- main-content-wrap -->
 <div class="main-content-inner">
@@ -187,6 +188,19 @@
                 </div>
 
                 <div class="cols gap22">
+                    <fieldset class="name">
+                        <div class="body-title mb-10">Choose Size <span class="tf-color-1">*</span></div>
+                        <div class="select mb-10">
+                            <select class="" name=size[] required>
+                                <option value="XS">XS</option>
+                                <option value="S">S</option>
+                                <option value="M">M</option>
+                                <option value="L">L</option>
+                                <option value="XL">XL</option>
+                                <option value="2XL">2XL</option>
+                            </select>
+                        </div>
+                    </fieldset>
                     <fieldset class="name">
                         <div class="body-title mb-10">Stock</div>
                         <div class="select mb-10">

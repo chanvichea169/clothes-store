@@ -1,4 +1,5 @@
-@extends('layouts.admin')
+@extends('admin.layouts.master')
+@section('title', ' - Brands')
 @section('content')
 <style>
     .swal2-confirm.btn-lg,

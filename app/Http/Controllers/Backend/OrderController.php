@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Transaction;
+use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 
 class OrderController extends Controller
@@ -13,9 +15,10 @@ class OrderController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(User $user)
     {
         $orders = Order::orderBy('created_at', 'DESC')->paginate(12);
+
         return view('admin.order.index', compact('orders'));
     }
 
@@ -66,9 +69,28 @@ class OrderController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update_order_status(Request $request)
     {
-        //
+        $order = Order::find($request->order_id);
+        $order->status = $request->order_status;
+
+        if ($order->status == 'delivered') {
+            $order->delivered_date = Carbon::now();
+        } else if ($order->status == 'canceled') {
+            $order->canceled_date = Carbon::now();
+        }
+
+        $order->save();
+
+        if ($request->order_status == 'delivered') {
+            $transaction = Transaction::where('order_id', $request->order_id)->first();
+            if ($transaction) {
+                $transaction->status = 'approved';
+                $transaction->save();
+            }
+        }
+
+        return back()->with("status", "Status changed successfully!");
     }
 
     /**

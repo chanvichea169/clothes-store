@@ -1,4 +1,5 @@
-@extends('layouts.admin')
+@extends('admin.layouts.master')
+@section('title', ' - Add_Product')
 @section('content')
 <!-- main-content-wrap -->
 <div class="main-content-inner">
