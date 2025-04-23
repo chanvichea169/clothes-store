@@ -28,7 +28,7 @@
                 </span>
             </a>
         </div>
-        <form name="checkout-form" action="{{ route('checkout.place.an.order') }}" method="POST">
+        <form name="checkout-form" id="checkout-form" action="{{ route('checkout.place.an.order') }}" method="POST">
             @csrf
             <div class="checkout-form">
                 <div class="billing-info__wrapper">
@@ -37,8 +37,6 @@
                             <h4>SHIPPING DETAILS</h4>
                         </div>
                     </div>
-
-                    <!-- Display the address if it exists -->
                     @if($address)
                         <div class="row">
                             <div class="col-md-12">
@@ -48,85 +46,10 @@
                                             <p><strong>{{ $address->name }}</strong></p>
                                             <p>{{ $address->address }}, {{ $address->locality }}</p>
                                             <p>{{ $address->city }}, {{ $address->state }}, {{ $address->country }} - {{ $address->zip }}</p>
+                                            <p>Email: {{ $address->email }}</p>
                                             <p>Phone: {{ $address->phone }}</p>
                                         </div>
                                     </div>
-                                </div>
-                            </div>
-                        </div>
-                    @else
-                        <!-- Display the address form if no address is found -->
-                        <div class="row mt-5">
-                            <div class="col-md-6">
-                                <div class="form-floating my-3">
-                                    <input type="text" class="form-control @error('name') is-invalid @enderror" name="name" id="name" required value="{{ old('name') }}">
-                                    <label for="name">Full Name *</label>
-                                    @error('name')
-                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating my-3">
-                                    <input type="text" class="form-control @error('phone') is-invalid @enderror" name="phone" id="phone" required value="{{ old('phone') }}">
-                                    <label for="phone">Phone Number *</label>
-                                    @error('phone')
-                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating my-3">
-                                    <input type="text" class="form-control @error('zip') is-invalid @enderror" name="zip" id="zip" required value="{{ old('zip') }}">
-                                    <label for="zip">Pincode *</label>
-                                    @error('zip')
-                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating my-3">
-                                    <input type="text" class="form-control @error('state') is-invalid @enderror" name="state" id="state" required value="{{ old('state') }}">
-                                    <label for="state">State *</label>
-                                    @error('state')
-                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="form-floating my-3">
-                                    <input type="text" class="form-control @error('city') is-invalid @enderror" name="city" id="city" required value="{{ old('city') }}">
-                                    <label for="city">Town / City *</label>
-                                    @error('city')
-                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating my-3">
-                                    <input type="text" class="form-control @error('address') is-invalid @enderror" name="address" id="address" required value="{{ old('address') }}">
-                                    <label for="address">House no, Building Name *</label>
-                                    @error('address')
-                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-6">
-                                <div class="form-floating my-3">
-                                    <input type="text" class="form-control @error('locality') is-invalid @enderror" name="locality" id="locality" required value="{{ old('locality') }}">
-                                    <label for="locality">Road Name, Area, Colony *</label>
-                                    @error('locality')
-                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                                    @enderror
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-floating my-3">
-                                    <input type="text" class="form-control @error('landmark') is-invalid @enderror" name="landmark" id="landmark" required value="{{ old('landmark') }}">
-                                    <label for="landmark">Landmark *</label>
-                                    @error('landmark')
-                                        <span class="invalid-feedback" role="alert">{{ $message }}</span>
-                                    @enderror
                                 </div>
                             </div>
                         </div>
@@ -138,10 +61,7 @@
                             <h3>Your Order</h3>
                             <table class="checkout-cart-items">
                                 <thead>
-                                    <tr>
-                                        <th>PRODUCT</th>
-                                        <th class="text-right">SUBTOTAL</th>
-                                    </tr>
+                                    <tr><th>PRODUCT</th><th class="text-right">SUBTOTAL</th></tr>
                                 </thead>
                                 <tbody>
                                     @foreach(Cart::instance('cart')->content() as $item)
@@ -154,52 +74,44 @@
                             </table>
                             <table class="checkout-totals">
                                 <tbody>
-                                    <tr>
-                                        <th>Subtotal</th>
-                                        <td class="text-right">${{ Cart::instance('cart')->subtotal() }}</td>
-                                    </tr>
+                                    <tr><th>Subtotal</th><td class="text-right">${{ Cart::instance('cart')->subtotal() }}</td></tr>
                                     @if(Session::has('coupon'))
-                                        <tr>
-                                            <th>Discount ({{ Session::get('coupon')['code'] }})</th>
-                                            <td class="text-right">-${{ Session::get('discounts')['discount'] ?? 0 }}</td>
-                                        </tr>
-                                        <tr>
-                                            <th>Subtotal After Discount</th>
-                                            <td class="text-right">${{ Session::get('discounts')['subtotal'] ?? Cart::instance('cart')->subtotal() }}</td>
-                                        </tr>
+                                        <tr><th>Discount ({{ Session::get('coupon')['code'] }})</th><td class="text-right">-${{ Session::get('discounts')['discount'] ?? 0 }}</td></tr>
+                                        <tr><th>Subtotal After Discount</th><td class="text-right">${{ Session::get('discounts')['subtotal'] ?? Cart::instance('cart')->subtotal() }}</td></tr>
                                     @endif
-                                    <tr>
-                                        <th>Shipping</th>
-                                        <td class="text-right">Free</td>
-                                    </tr>
-                                    <tr>
-                                        <th>VAT</th>
-                                        <td class="text-right">${{ Session::has('coupon') ? Session::get('discounts')['tax'] : Cart::instance('cart')->tax() }}</td>
-                                    </tr>
-                                    <tr>
-                                        <th>Total</th>
-                                        <td class="text-right">${{ Session::has('coupon') ? Session::get('discounts')['total'] : Cart::instance('cart')->total() }}</td>
-                                    </tr>
+                                    <tr><th>Shipping</th><td class="text-right">Free</td></tr>
+                                    <tr><th>VAT</th><td class="text-right">${{ Session::has('coupon') ? Session::get('discounts')['tax'] : Cart::instance('cart')->tax() }}</td></tr>
+                                    <tr><th>Total</th><td class="text-right">${{ Session::has('coupon') ? Session::get('discounts')['total'] : Cart::instance('cart')->total() }}</td></tr>
                                 </tbody>
                             </table>
                         </div>
+
                         <div class="checkout__payment-methods">
                             <div class="form-check">
-                                <input class="form-check-input form-check-input_fill" type="radio" name="mode" id="mode1" value="card" required>
+                                <input class="form-check-input" type="radio" name="mode" id="mode1" value="card" required>
                                 <label class="form-check-label" for="mode1">Debit or Credit Card</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input form-check-input_fill" type="radio" name="mode" id="mode2" value="paypal" required>
+                                <input class="form-check-input" type="radio" name="mode" id="mode2" value="paypal" required>
                                 <label class="form-check-label" for="mode2">PayPal</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input form-check-input_fill" type="radio" name="mode" id="mode3" value="cod" required>
+                                <input class="form-check-input" type="radio" name="mode" id="mode3" value="cod" required>
                                 <label class="form-check-label" for="mode3">Cash on Delivery</label>
                             </div>
+
+                            <div id="card-form" class="mt-4" style="display: none;">
+                                <div id="card-element"></div>
+                                <div id="card-errors" role="alert" class="text-danger mt-2"></div>
+                            </div>
+
+                            <div id="paypal-button-container" class="mt-3" style="display: none;"></div>
+
                             <div class="policy-text">
-                                Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our <a href="#" target="_blank">privacy policy</a>.
+                                Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our <a href="#">privacy policy</a>.
                             </div>
                         </div>
+
                         <button type="submit" class="btn btn-primary btn-checkout">PLACE ORDER</button>
                     </div>
                 </div>
@@ -208,3 +120,102 @@
     </section>
 </main>
 @endsection
+
+@section('scripts')
+<script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.client_id') }}&currency=USD"></script>
+<script src="https://js.stripe.com/v3/"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const paypalRadio = document.getElementById('mode2');
+        const cardRadio = document.getElementById('mode1');
+        const codRadio = document.getElementById('mode3');
+        const paypalContainer = document.getElementById('paypal-button-container');
+        const cardForm = document.getElementById('card-form');
+        const placeOrderBtn = document.querySelector('.btn-checkout');
+        const form = document.getElementById('checkout-form');
+
+        // Show/Hide Payment Sections
+        function togglePaymentUI() {
+            if (paypalRadio.checked) {
+                paypalContainer.style.display = 'block';
+                cardForm.style.display = 'none';
+                placeOrderBtn.style.display = 'none';
+            } else if (cardRadio.checked) {
+                cardForm.style.display = 'block';
+                paypalContainer.style.display = 'none';
+                placeOrderBtn.style.display = 'block';
+            } else if (codRadio.checked) {
+                cardForm.style.display = 'none';
+                paypalContainer.style.display = 'none';
+                placeOrderBtn.style.display = 'block';
+            }
+        }
+
+        document.querySelectorAll('input[name="mode"]').forEach(radio => {
+            radio.addEventListener('change', togglePaymentUI);
+        });
+
+        togglePaymentUI(); // Initial state
+
+        // PayPal Buttons
+        paypal.Buttons({
+            createOrder: (data, actions) => {
+                return actions.order.create({
+                    purchase_units: [{
+                        amount: {
+                            value: "{{ Session::has('coupon') ? Session::get('discounts')['total'] : Cart::instance('cart')->total() }}"
+                        }
+                    }]
+                });
+            },
+            onApprove: (data, actions) => {
+                return actions.order.capture().then(function(details) {
+                    const formData = new FormData(form);
+                    formData.append('paypal_order_id', data.orderID);
+                    formData.append('mode', 'paypal');
+
+                    fetch("{{ route('checkout.place.an.order') }}", {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+                        body: formData
+                    })
+                    .then(res => res.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            window.location.href = result.redirect_url;
+                        } else {
+                            alert(result.message || 'Payment failed.');
+                        }
+                    });
+                });
+            }
+        }).render('#paypal-button-container');
+
+        // Stripe Setup
+        const stripe = Stripe('{{ config('services.stripe.key') }}');
+        const elements = stripe.elements();
+        const cardElement = elements.create('card');
+        cardElement.mount('#card-element');
+
+        form.addEventListener('submit', async (e) => {
+            if (!cardRadio.checked) return; // Submit directly for COD
+
+            e.preventDefault();
+
+            const { token, error } = await stripe.createToken(cardElement);
+
+            if (error) {
+                document.getElementById('card-errors').textContent = error.message;
+            } else {
+                let input = document.createElement('input');
+                input.setAttribute('type', 'hidden');
+                input.setAttribute('name', 'stripeToken');
+                input.setAttribute('value', token.id);
+                form.appendChild(input);
+                form.submit();
+            }
+        });
+    });
+</script>
+@endsection
+

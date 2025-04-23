@@ -1,3 +1,4 @@
+<x-alert type="success" />
 @extends('frontend.layouts.master')
 @section('title', '- Home')
 @section('content')
@@ -17,9 +18,7 @@
         color: orange;
     }
 </style>
-
 <main>
-
     <section class="swiper-container js-swiper-slider swiper-number-pagination slideshow" data-settings='{
         "autoplay": {
           "delay": 5000
@@ -55,7 +54,6 @@
         </div>
         @endforeach
       </div>
-
       <div class="container">
         <div
           class="slideshow-pagination slideshow-number-pagination d-flex align-items-center position-absolute bottom-0 mb-5">
@@ -129,8 +127,8 @@
             <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
               <use href="#icon_next_md" />
             </svg>
-          </div><!-- /.products-carousel__next -->
-        </div><!-- /.position-relative -->
+          </div>
+        </div>
       </section>
 
       <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
@@ -427,6 +425,7 @@
     </div>
     <div class="mb-3 mb-xl-5 pt-1 pb-4">
     </div>
-  </main>
+</main>
+
 
 @endsection

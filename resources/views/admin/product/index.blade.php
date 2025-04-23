@@ -48,8 +48,8 @@
                         class="icon-plus"></i>Add new</a>
             </div>
             <div class="table-responsive">
-                @if(Session::has('status'))
-                    <div class="alert alert-success">{{ Session::get('success') }}</div>
+                @if(Session::has('success'))
+                    <div class="alert alert-success" style="font-size:18px; color:green;">{{ Session::get('success') }}</div>
                 @endif
                 <table class="table table-striped table-bordered">
                     <thead>
@@ -59,7 +59,6 @@
                             <th>Price</th>
                             <th>SalePrice</th>
                             <th>SKU</th>
-                            <th>Size</th>
                             <th>Category</th>
                             <th>Brand</th>
                             <th>Featured</th>
@@ -85,7 +84,6 @@
                             <td>{{ $product->price }}</td>
                             <td>{{ $product->cost }}</td>
                             <td>{{ $product->SKU }}</td>
-                            <td>{{ $product->size }}</td>
                             <td>{{ $product->category_id }}</td>
                             <td>{{ $product->brand_id }}</td>
                             <td>{{ $product->featured }}</td>

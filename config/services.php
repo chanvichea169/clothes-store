@@ -35,4 +35,27 @@ return [
         ],
     ],
 
+    'github' => [
+        'client_id' => env('GITHUB_CLIENT_ID'),
+        'client_secret' => env('GITHUB_CLIENT_SECRET'),
+        'redirect' => env('GITHUB_REDIRECT_URI'),
+    ],
+
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_CALLBACK_REDIRECTS'),
+    ],
+
+    'paypal' => [
+        'client_id' => env('PAYPAL_SANDBOX_CLIENT_ID'),
+        'secret' => env('PAYPAL_SANDBOX_SECRET'),
+        'mode' => env('PAYPAL_SANDBOX_MODE', 'sandbox') ? 'sandbox' : 'live',
+    ],
+    'stripe' => [
+        'key' => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
+    ],
+
+
 ];

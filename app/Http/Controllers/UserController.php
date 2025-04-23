@@ -55,7 +55,7 @@ class UserController extends Controller
             return redirect()->route('login');
         }
 
-        $address = Address::where('user_id', $user_id)->first(); // Assuming user_id is the correct column
+        $address = Address::where('user_id', Auth::id())->first();
         return view('user.account_address', compact('address'));
     }
 
@@ -67,10 +67,12 @@ class UserController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
             'phone' => 'required|string|max:15',
             'zip' => 'required|string|max:10',
             'state' => 'required|string|max:100',
             'city' => 'required|string|max:100',
+            'country' => 'required|string|max:100',
             'address' => 'required|string|max:255',
             'locality' => 'required|string|max:255',
             'landmark' => 'nullable|string|max:255',
@@ -80,10 +82,12 @@ class UserController extends Controller
         Address::create([
             'user_id' => Auth::id(),
             'name' => $request->name,
+            'email' => $request->email,
             'phone' => $request->phone,
             'zip' => $request->zip,
             'state' => $request->state,
             'city' => $request->city,
+            'country' => $request->country,
             'address' => $request->address,
             'locality' => $request->locality,
             'landmark' => $request->landmark,
@@ -96,17 +100,24 @@ class UserController extends Controller
     public function editAddress($address_id)
     {
         $address = Address::find($address_id);
+
+        if (!$address) {
+            return redirect()->route('user.address')->with('error', 'Address not found!');
+        }
+
         return view('user.edit_address', compact('address'));
     }
     public function updateAddress(Request $request, $address_id)
     {
         $request->validate([
             'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
             'phone' => 'required|string|max:15',
             'zip' => 'required|string|max:10',
             'state' => 'required|string|max:100',
             'city' => 'required|string|max:100',
             'address' => 'required|string|max:255',
+            'country' => 'required|string|max:100',
             'locality' => 'required|string|max:255',
             'landmark' => 'nullable|string|max:255',
             'isdefault' => 'nullable|boolean',
@@ -114,11 +125,12 @@ class UserController extends Controller
 
         $address = Address::find($address_id);
         $address->name = $request->name;
+        $address->email = $request->email;
         $address->phone = $request->phone;
         $address->zip = $request->zip;
         $address->state = $request->state;
         $address->city = $request->city;
-
+        $address->country = $request->country;
         $address->address = $request->address;
         $address->locality = $request->locality;
         $address->landmark = $request->landmark;

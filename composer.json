@@ -10,11 +10,19 @@
     "license": "MIT",
     "require": {
         "php": "^8.2",
+        "hardevine/shoppingcart": "^3.4",
         "intervention/image-laravel": "^1.2",
-        "laravel/framework": "^11.31",
+        "laravel/framework": "*",
+        "laravel/socialite": "^5.19",
         "laravel/tinker": "^2.9",
         "laravel/ui": "^4.6",
-        "surfsidemedia/shoppingcart": "^1.0"
+        "paypal/paypal-checkout-sdk": "^1.0",
+        "paypal/rest-api-sdk-php": "^1.6",
+        "socialiteproviders/github": "^4.1",
+        "socialiteproviders/google": "^4.1",
+        "srmklive/paypal": "*",
+        "stripe/stripe-php": "^17.1",
+        "surfsidemedia/shoppingcart": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

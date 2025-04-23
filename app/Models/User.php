@@ -22,6 +22,8 @@ class User extends Authenticatable
         'email',
         'password',
         'mobile',
+        'provider',
+        'provider_id'
     ];
 
     /**
@@ -44,6 +46,9 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'mobile' => 'string',
+            'google_id' => 'string',
+
         ];
     }
 

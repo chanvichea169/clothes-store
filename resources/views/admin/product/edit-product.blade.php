@@ -33,8 +33,7 @@
         @if(Session::has('error'))
             <h4 class="alert alert-danger text-center">{{ Session::get('error') }}</h4>
         @endif
-        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data"
-            action="{{ route('admin.update.product') }}">
+        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data" action="{{ route('admin.update.product',['id'=>$product->id]) }}">
             @method('PUT')
             @csrf
             <input type="hidden" name="id" value="{{ $product->id }}">
@@ -189,19 +188,6 @@
 
                 <div class="cols gap22">
                     <fieldset class="name">
-                        <div class="body-title mb-10">Choose Size <span class="tf-color-1">*</span></div>
-                        <div class="select mb-10">
-                            <select class="" name=size[] required>
-                                <option value="XS">XS</option>
-                                <option value="S">S</option>
-                                <option value="M">M</option>
-                                <option value="L">L</option>
-                                <option value="XL">XL</option>
-                                <option value="2XL">2XL</option>
-                            </select>
-                        </div>
-                    </fieldset>
-                    <fieldset class="name">
                         <div class="body-title mb-10">Stock</div>
                         <div class="select mb-10">
                             <select class="" name="stock_status">
@@ -231,6 +217,7 @@
     <!-- /main-content-wrap -->
 </div>
 
+@endsection
 @push('scripts')
     <script>
         $(function() {
@@ -252,7 +239,41 @@
                 });
             });
 
+            $(document).ready(function() {
+            $('#categoryDropdown').change(function() {
+                const categoryId = $(this).val();
+
+                if (categoryId) {
+                    $.ajax({
+                        url: '/get-brands-by-category',
+                        type: 'GET',
+                        data: { category_id: categoryId },
+                        success: function(response) {
+                            const brandDropdown = $('#brandDropdown');
+                            brandDropdown.empty();
+                            brandDropdown.append('<option value="">Choose Brand</option>');
+
+                            if (response.length > 0) {
+                                $.each(response, function(index, brand) {
+                                    brandDropdown.append(`<option value="${brand.id}">${brand.brand_name}</option>`);
+                                });
+                            } else {
+                                brandDropdown.append('<option value="">No brands found for this category</option>');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error fetching brands:', xhr.responseText);
+                            $('#brandDropdown').empty();
+                            $('#brandDropdown').append('<option value="">Error fetching brands</option>');
+                        }
+                    });
+                } else {
+                    $('#brandDropdown').empty();
+                    $('#brandDropdown').append('<option value="">Choose Brand</option>');
+                }
+            });
+        });
+
         });
     </script>
 @endpush
-@endsection

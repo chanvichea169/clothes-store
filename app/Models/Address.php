@@ -15,6 +15,7 @@ class Address extends Model
         'city',
         'address',
         'locality',
+        'country',
         'landmark',
         'isdefault',
     ];

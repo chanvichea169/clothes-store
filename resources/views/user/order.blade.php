@@ -25,13 +25,40 @@
         }
 
         .bg-danger {
-        background-color: #f44032 !important;
+            background-color: #f44032 !important;
         }
 
         .bg-warning {
-        background-color: #f5d700 !important;
-        color: #000;
+            background-color: #f5d700 !important;
+            color: #000;
         }
+        .list-icon-function .item {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background-color: #f0f4ff;
+                border: 1px solid #cddafd;
+                border-radius: 6px;
+                padding: 6px 12px;
+                color: #2563eb; /* blue-600 */
+                font-size: 14px;
+                cursor: pointer;
+                transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            }
+
+            .list-icon-function .item:hover {
+                background-color: #e0ecff;
+                box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            }
+
+            .list-icon-function .item span {
+                font-size: 20px;
+            }
+
+            .list-icon-function .item p {
+                margin: 0;
+                font-weight: 500;
+            }
     </style>
 
     <main class="pt-90" style="padding-top: 0px;">
@@ -91,12 +118,12 @@
                                     <td class="text-center">{{ $order->deliverd_date }}</td>
                                     <td class="text-center">
                                         <a href="{{ route('user.order.details', $order->id) }}">
-                                        <div class="list-icon-function view-icon">
-                                            <div class="item eye" style="color: blue;font-size:18px;">
-                                                <i class="fa fa-eye"></i>
-                                                view
+                                            <div class="list-icon-function view-icon float-start">
+                                                <div class="item eye">
+                                                    <span class="material-symbols-rounded">visibility</span>
+                                                    <p>View</p>
+                                                </div>
                                             </div>
-                                        </div>
                                         </a>
                                     </td>
                                 </tr>

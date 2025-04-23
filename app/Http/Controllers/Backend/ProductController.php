@@ -21,16 +21,21 @@ class ProductController extends Controller
 
     public function add_product()
     {
-        $categories = Category::select(
-            'id', 'name'
-        )->orderBy('name', 'asc')->get();
+        // Fetch categories
+        $categories = Category::select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
 
-        $brands = Brand::select(
-            'id', 'name'
-        )->orderBy('name', 'asc')->get();
+        // Fetch brands
+        $brands = Brand::select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
 
-        return view('admin.product.add-product' , compact('categories', 'brands'));
+        // Pass both categories and brands to the view
+        return view('admin.product.add-product', compact('categories', 'brands'));
     }
+
+
 
     public function store_product(Request $request)
     {
@@ -42,7 +47,6 @@ class ProductController extends Controller
             'price' => 'required',
             'cost' => 'required',
             'SKU' => 'required',
-            'size' => 'required',
             'stock_status' => 'required',
             'featured' => 'required',
             'quantity' => 'required',
@@ -50,9 +54,10 @@ class ProductController extends Controller
             'category_id' => 'required',
             'brand_id' => 'required',
             'gallery' => 'array',
-            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Gallery validation
         ]);
 
+        // Create Product
         $product = new Product();
         $product->name = $request->name;
         $product->slug = Str::slug($request->name);
@@ -60,7 +65,6 @@ class ProductController extends Controller
         $product->status = $request->status;
         $product->price = $request->price;
         $product->cost = $request->cost;
-        $product->size = $request->size;
         $product->SKU = $request->SKU;
         $product->stock_status = $request->stock_status;
         $product->featured = $request->featured;
@@ -105,16 +109,25 @@ class ProductController extends Controller
     public function edit_product($id)
     {
         $product = Product::findOrFail($id);
-        $categories = Category::select(
-            'id', 'name'
-        )->orderBy('name', 'asc')->get();
 
-        $brands = Brand::select(
-            'id', 'name'
-        )->orderBy('name', 'asc')->get();
+        // Fetch categories
+        $categories = Category::select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+
+        // Fetch brands based on the category of the product
+        $brands = Brand::join('products', 'brands.id', '=', 'products.brand_id')
+            ->join('categories', 'products.category_id', '=', 'categories.id')
+            ->where('categories.name', $product->category->name) // Match category name like your SQL query
+            ->select('brands.id', 'brands.name')
+            ->distinct()
+            ->orderBy('brands.name', 'asc')
+            ->get();
 
         return view('admin.product.edit-product', compact('product', 'categories', 'brands'));
     }
+
+
 
     public function update_product(Request $request)
     {
@@ -126,13 +139,12 @@ class ProductController extends Controller
             'price' => 'required',
             'cost' => 'required',
             'SKU' => 'required',
-            'size' => 'required',
             'stock_status' => 'required',
             'featured' => 'required',
             'quantity' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'gallery' => 'array',
-            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Gallery validation
             'category_id' => 'required',
             'brand_id' => 'required',
         ]);
@@ -145,7 +157,6 @@ class ProductController extends Controller
         $product->price = $request->price;
         $product->cost = $request->cost;
         $product->SKU = $request->SKU;
-        $product->size = $request->size;
         $product->stock_status = $request->stock_status;
         $product->featured = $request->featured;
         $product->quantity = $request->quantity;

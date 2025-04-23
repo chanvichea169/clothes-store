@@ -66,3 +66,35 @@
 </main>
 
 @endsection
+
+@push('scripts')
+
+<script>
+document.getElementById("contact-us-form").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    let form = event.target;
+    let formData = new FormData(form);
+
+    // Send form data to Laravel
+    fetch(form.action, {
+        method: "POST",
+        body: formData
+    }).then(response => response.json())
+    .then(data => console.log("Laravel Response:", data))
+    .catch(error => console.error("Laravel Error:", error));
+
+    // Send form data to Getform.io
+    fetch("https://getform.io/f/bkkyrpgb", {
+        method: "POST",
+        body: formData
+    }).then(response => response.json())
+    .then(data => console.log("Getform.io Response:", data))
+    .catch(error => console.error("Getform.io Error:", error));
+
+    alert("Your message has been sent!");
+    form.reset(); // Reset form after submission
+});
+</script>c
+
+@endpush

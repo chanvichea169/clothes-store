@@ -121,7 +121,7 @@
                             </div>
                         </div>
                         <div class="col-12 text-right">
-                            <a class="btn btn-sm btn-info" href="{{ route('user.orders') }}">
+                            <a class="btn btn-sm btn-primary text-light" href="{{ route('user.orders') }}">
                                 <i class="fa-solid fa-arrow-left"></i>
                                 Back
                             </a>
@@ -295,7 +295,7 @@
                         @csrf
                         @method('PUT')
                         <input type="hidden" name="order_id" value="{{ $order->id }}">
-                        <button type="button" class="btn btn-danger cancel-order">Cancel Order</button>
+                        <button type="button" class="btn btn-md text-white cancel-order" style="background-color: #dc3545">Cancel Order</button>
                     </form>
                 </div>
                 @endif

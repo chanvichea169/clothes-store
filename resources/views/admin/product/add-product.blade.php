@@ -1,9 +1,7 @@
 @extends('admin.layouts.master')
 @section('title', ' - Add_Product')
 @section('content')
-<!-- main-content-wrap -->
 <div class="main-content-inner">
-    <!-- main-content-wrap -->
     <div class="main-content-wrap">
         <div class="flex items-center flex-wrap justify-between gap20 mb-27">
             <h3>Add Product</h3>
@@ -29,7 +27,6 @@
                 </li>
             </ul>
         </div>
-        <!-- form-add-product -->
         <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data"
             action="{{ route('admin.store.product') }}">
             @csrf
@@ -38,12 +35,10 @@
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
                 <fieldset class="name">
-                    <div class="body-title mb-10">Product name <span class="tf-color-1">*</span>
-                    </div>
+                    <div class="body-title mb-10">Product name <span class="tf-color-1">*</span></div>
                     <input class="mb-10" type="text" placeholder="Enter product name"
                         name="name" tabindex="0" value="{{ old('name') }}" aria-required="true" required="">
-                    <div class="text-tiny">Do not exceed 100 characters when entering the
-                        product name.</div>
+                    <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
                 </fieldset>
                 @error('slug')
                     <div class="alert alert-danger">{{ $message }}</div>
@@ -52,36 +47,31 @@
                     <div class="body-title mb-10">Slug <span class="tf-color-1">*</span></div>
                     <input class="mb-10" type="text" placeholder="Enter product slug"
                         name="slug" tabindex="0" value="{{ old('slug') }}" aria-required="true" required="">
-                    <div class="text-tiny">Do not exceed 100 characters when entering the
-                        product name.</div>
+                    <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
                 </fieldset>
                 @error('category_id')
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
                 <div class="gap22 cols">
                     <fieldset class="category">
-                        <div class="body-title mb-10">Category <span class="tf-color-1">*</span>
-                        </div>
+                        <div class="body-title mb-10">Category <span class="tf-color-1">*</span></div>
                         <div class="select">
-                            <select class="" name="category_id">
-                                <option>Choose category</option>
+                            <select id="categoryDropdown" name="category_id">
+                                <option value="">Choose category</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}">{{ $category->name }}</option>
                                 @endforeach
-
                             </select>
                         </div>
                     </fieldset>
                     @error('brand_id')
                         <div class="alert alert-danger">{{ $message }}</div>
-
                     @enderror
                     <fieldset class="brand">
-                        <div class="body-title mb-10">Brand <span class="tf-color-1">*</span>
-                        </div>
+                        <div class="body-title mb-10">Brand <span class="tf-color-1">*</span></div>
                         <div class="select">
-                            <select class="" name="brand_id">
-                                <option>Choose Brand</option>
+                            <select id="brandDropdown" name="brand_id">
+                                <option value="">Choose Brand</option>
                                 @foreach($brands as $brand)
                                     <option value="{{ $brand->id }}">{{ $brand->name }}</option>
                                 @endforeach
@@ -91,37 +81,30 @@
                 </div>
                 @error('status')
                     <div class="alert alert-danger">{{ $message }}</div>
-
                 @enderror
                 <fieldset class="shortdescription">
-                    <div class="body-title mb-10">Status <span
-                            class="tf-color-1">*</span></div>
+                    <div class="body-title mb-10">Status <span class="tf-color-1">*</span></div>
                     <textarea class="mb-10 ht-150" name="status"
                         placeholder="status" tabindex="0" aria-required="true"
                         required="">{{ old('status') }}</textarea>
-                    <div class="text-tiny">Do not exceed 100 characters when entering the
-                        product name.</div>
+                    <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
                 </fieldset>
                 @error('description')
                     <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
                 <fieldset class="description">
-                    <div class="body-title mb-10">Description <span class="tf-color-1">*</span>
-                    </div>
+                    <div class="body-title mb-10">Description <span class="tf-color-1">*</span></div>
                     <textarea class="mb-10" name="description" placeholder="Description"
                         tabindex="0" aria-required="true" required="">{{ old('description') }}</textarea>
-                    <div class="text-tiny">Do not exceed 100 characters when entering the
-                        product name.</div>
+                    <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
                 </fieldset>
             </div>
             <div class="wg-box">
                 @error('image')
                     <div class="alert alert-danger">{{ $message }}</div>
-
                 @enderror
                 <fieldset>
-                    <div class="body-title">Upload images <span class="tf-color-1">*</span>
-                    </div>
+                    <div class="body-title">Upload images <span class="tf-color-1">*</span></div>
                     <div class="upload-image flex-grow">
                         <div class="item" id="imgpreview" style="display:none">
                             <img src="../../../localhost_8000/images/upload/upload-1.png"
@@ -157,39 +140,48 @@
                     </div>
                 </fieldset>
                 <div class="cols gap22">
+                    @error('price')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                     <fieldset class="name">
-                        <div class="body-title mb-10">Regular Price <span
-                                class="tf-color-1">*</span></div>
+                        <div class="body-title mb-10">Regular Price <span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter regular price"
                             name="price" tabindex="0" value="{{ old('price') }}" aria-required="true"
                             required="">
                     </fieldset>
+                    @error('cost')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                     <fieldset class="name">
-                        <div class="body-title mb-10">Sale Price <span
-                                class="tf-color-1">*</span></div>
+                        <div class="body-title mb-10">Sale Price <span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter Cost"
                             name="cost" tabindex="0" value="{{ old('cost') }}" aria-required="true"
                             required="">
                     </fieldset>
                 </div>
-
                 <div class="cols gap22">
+                    @error('SKU')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                     <fieldset class="name">
-                        <div class="body-title mb-10">SKU <span class="tf-color-1">*</span>
-                        </div>
+                        <div class="body-title mb-10">SKU <span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter SKU" name="SKU"
                             tabindex="0" value="{{ old('SKU') }}" aria-required="true" required="">
                     </fieldset>
+                    @error('quantity')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                     <fieldset class="name">
-                        <div class="body-title mb-10">Quantity <span class="tf-color-1">*</span>
-                        </div>
+                        <div class="body-title mb-10">Quantity <span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter quantity"
                             name="quantity" tabindex="0" value="{{ old('quantity') }}" aria-required="true"
                             required="">
                     </fieldset>
                 </div>
-
                 <div class="cols gap22">
+                    @error('stock_status')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                     <fieldset class="name">
                         <div class="body-title mb-10">Stock</div>
                         <div class="select mb-10">
@@ -199,6 +191,9 @@
                             </select>
                         </div>
                     </fieldset>
+                    @error('featured')
+                    <div class="alert alert-danger">{{ $message }}</div>
+                    @enderror
                     <fieldset class="name">
                         <div class="body-title mb-10">Featured</div>
                         <div class="select mb-10">
@@ -214,43 +209,38 @@
                 </div>
             </div>
         </form>
-        <!-- /form-add-product -->
     </div>
-    <!-- /main-content-wrap -->
 </div>
 
 @push('scripts')
-    <script>
-        $(function() {
-
-            $('#myFile').on('change', function(e) {
-                const photoInput = $('#myFile');
-                const [file] = this.files;
-                if (file) {
-                    $("#imgpreview img").attr('src', URL.createObjectURL(file));
-                    $('#imgpreview').show();
-                }
-            });
-
-            $('#gFile').on('change', function(e) {
-                const photoInput = $('#gFile');
-                const gphotos = this.files;
-                $.each(gphotos, function(key, value) {
-                   $('#galUpload').prepend(`<div class="item gitems"><img src="${URL.createObjectURL(value)}" /></div>`);
-                   });
-            });
-
-            $("input[name='name']").on('change', function() {
-                $("input[name='slug']").val(stringToSlug($(this).val()));
-            });
-
-            function stringToSlug(Text) {
-                return Text.toLowerCase()
-                    .replace(/ /g, '-')
-                    .replace(/[^\w-]+/g, '');
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(function() {
+        $('#myFile').on('change', function(e) {
+            const [file] = this.files;
+            if (file) {
+                $("#imgpreview img").attr('src', URL.createObjectURL(file));
+                $('#imgpreview').show();
             }
         });
-    </script>
-@endpush
 
+        $('#gFile').on('change', function(e) {
+            const gphotos = this.files;
+            $.each(gphotos, function(key, value) {
+                $('#galUpload').prepend(`<div class="item gitems"><img src="${URL.createObjectURL(value)}" /></div>`);
+            });
+        });
+
+        $("input[name='name']").on('change', function() {
+            $("input[name='slug']").val(stringToSlug($(this).val()));
+        });
+
+        function stringToSlug(Text) {
+            return Text.toLowerCase()
+                .replace(/ /g, '-')
+                .replace(/[^\w-]+/g, '');
+        }
+    });
+</script>
+@endpush
 @endsection

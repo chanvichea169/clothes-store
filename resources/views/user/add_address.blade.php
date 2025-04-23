@@ -22,7 +22,8 @@
                       <p class="notice">The following addresses will be used on the checkout page by default.</p>
                   </div>
                   <div class="col-6 text-right">
-                      <a href="{{ route('user.address') }}" class="btn btn-sm btn-danger">Back</a>
+                      <a href="{{ route('user.address') }}" class="btn btn-sm btn-primary text-light"><span class="material-symbols-rounded">
+                        arrow_back</span>Back</a>
                   </div>
               </div>
 
@@ -55,6 +56,15 @@
                                               @enderror
                                           </div>
                                       </div>
+                                      <div class="col-md-6">
+                                          <div class="form-floating my-3">
+                                              <input type="text" class="form-control" name="phone" value="{{ old('email') }}">
+                                              <label for="phone">Email <code class="text-dangers">*</code></label>
+                                              @error('phone')
+                                                  <span class="text-danger">{{ $message }}</span>
+                                              @enderror
+                                          </div>
+                                      </div>
                                       <div class="col-md-4">
                                           <div class="form-floating my-3">
                                               <input type="text" class="form-control" name="zip" value="{{ old('zip') }}">
@@ -64,6 +74,7 @@
                                               @enderror
                                           </div>
                                       </div>
+
                                       <div class="col-md-4">
                                           <div class="form-floating mt-3 mb-3">
                                               <input type="text" class="form-control" name="state" value="{{ old('state') }}">
@@ -100,6 +111,15 @@
                                               @enderror
                                           </div>
                                       </div>
+                                      <div class="col-md-6">
+                                        <div class="form-floating mt-3 mb-3">
+                                            <input type="text" class="form-control" name="country" value="{{ old('country') }}">
+                                            <label for="country">Country <code class="text-dangers">*</code></label>
+                                            @error('country')
+                                                <span class="text-danger">{{ $message }}</span>
+                                            @enderror
+                                        </div>
+                                    </div>
                                       <div class="col-md-12">
                                           <div class="form-floating my-3">
                                               <input type="text" class="form-control" name="landmark" value="{{ old('landmark') }}">
@@ -118,7 +138,7 @@
                                           </div>
                                       </div>
                                       <div class="col-md-12 text-right">
-                                          <button type="submit" class="btn btn-success">Submit</button>
+                                          <button type="submit" class="btn btn-primary text-light">Submit</button>
                                       </div>
                                   </div>
                               </form>

@@ -7,6 +7,7 @@ use App\Models\Category;
 use App\Models\Product;
 use App\Models\Slide;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class HomeController extends Controller
 {
@@ -17,12 +18,5 @@ class HomeController extends Controller
         $onSaleProducts = Product::whereNotNull('cost')->where('cost', '<>', '')->inRandomOrder()->take(8)->get();
         $fProducts = Product::where('featured', 1)->take(8)->get();
         return view('index', compact('slides', 'categories', 'onSaleProducts', 'fProducts'));
-    }
-
-    public function search(Request $request)
-    {
-        $search = $request->input('search');
-        $result = Product::where('name', 'LIKE', "%{$search}%")->get()->take(10);
-        return response()->json($result);
     }
 }

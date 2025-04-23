@@ -54,7 +54,7 @@
                 </div>
                 <div class="order-info__item">
                     <label>Payment Method</label>
-                    <span>{{ $order->transaction->mode ?? 'N/A' }}</span>
+                    <span>{{ $order->transactions->mode ?? 'N/A' }}</span>
                 </div>
             </div>
             <div class="checkout__totals-wrapper">

@@ -22,7 +22,9 @@
                             <p class="notice">Update your saved address below.</p>
                         </div>
                         <div class="col-6 text-right">
-                            <a href="{{ route('user.address') }}" class="btn btn-sm btn-danger">Back</a>
+                            <a href="{{ route('user.address') }}"class="btn btn-sm btn-primary text-light"><span class="material-symbols-rounded">
+                                arrow_back</span>Back
+                            </a>
                         </div>
                     </div>
 
@@ -47,6 +49,17 @@
                                                     <label for="name">Full Name <code
                                                             class="text-dangers">*</code></label>
                                                     @error('name')
+                                                    <span class="text-danger">{{ $message }}</span>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-floating my-3">
+                                                    <input type="text" class="form-control" name="email"
+                                                        value="{{ old('email', $address->email) }}">
+                                                    <label for="email">Email <code
+                                                            class="text-dangers">*</code></label>
+                                                    @error('email')
                                                     <span class="text-danger">{{ $message }}</span>
                                                     @enderror
                                                 </div>
@@ -148,7 +161,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-12 text-right">
-                                                <button type="submit" class="btn btn-success">Update Address</button>
+                                                <button type="submit" class="btn btn-primary">Update</button>
                                             </div>
                                         </div>
                                     </form>
