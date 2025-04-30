@@ -8,6 +8,8 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Clothes-Shop - Register</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <!-- Add Font Awesome for eye icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --primary: #4361ee;
@@ -149,6 +151,31 @@
         .form-group input::placeholder {
             color: var(--text-light);
             opacity: 0.6;
+        }
+
+        /* Password toggle specific styles */
+        .input-group {
+            position: relative;
+        }
+
+        .input-group input {
+            padding-right: 40px !important;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none !important;
+            border: none !important;
+            color: var(--text-light);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
         }
 
         .register-btn {
@@ -354,7 +381,12 @@
 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                        <span class="toggle-password" data-target="password">
+                            <i class="far fa-eye"></i>
+                        </span>
+                    </div>
                     @error('password')
                         <span class="error-message">{{ $message }}</span>
                     @enderror
@@ -362,7 +394,12 @@
 
                 <div class="form-group">
                     <label for="password-confirm">Confirm Password</label>
-                    <input type="password" id="password-confirm" name="password_confirmation" placeholder="••••••••" required>
+                    <div class="input-group">
+                        <input type="password" id="password-confirm" name="password_confirmation" placeholder="••••••••" required>
+                        <span class="toggle-password" data-target="password-confirm">
+                            <i class="far fa-eye"></i>
+                        </span>
+                    </div>
                 </div>
 
                 <button type="submit" class="register-btn">Create Account</button>
@@ -379,10 +416,6 @@
                              height="20">
                         Continue with Google
                     </a>
-                   {{--  <a href="#" class="social-btn">
-                        <img src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png" alt="GitHub">
-                        Continue with GitHub
-                    </a> --}}
                 </div>
 
                 <div class="login-link">
@@ -391,5 +424,29 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get all toggle password buttons
+            const toggleButtons = document.querySelectorAll('.toggle-password');
+
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Get the target input field
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+
+                    // Toggle the type attribute
+                    const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordInput.setAttribute('type', type);
+
+                    // Toggle the eye icon
+                    icon.classList.toggle('fa-eye');
+                    icon.classList.toggle('fa-eye-slash');
+                });
+            });
+        });
+    </script>
 </body>
 </html>

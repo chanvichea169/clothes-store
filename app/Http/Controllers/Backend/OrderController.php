@@ -22,21 +22,6 @@ class OrderController extends Controller
         return view('admin.order.index', compact('orders'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -56,14 +41,6 @@ class OrderController extends Controller
         $transaction = Transaction::where('order_id', $order_id)->first();
 
         return view('admin.order.details', compact('order', 'orderItems', 'transaction'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
     }
 
     /**
@@ -91,13 +68,5 @@ class OrderController extends Controller
         }
 
         return back()->with("status", "Status changed successfully!");
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
     }
 }

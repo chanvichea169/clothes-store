@@ -84,7 +84,7 @@
                     </fieldset>
                 <div class="bot">
                     <div></div>
-                    <button class="tf-button w208" type="submit">Save</button>
+                    <button class="tf-button w208" type="submit">Save Change</button>
                 </div>
             </form>
         </div>
@@ -118,8 +118,8 @@
                 return Text
                     .toLowerCase()
                     .trim()
-                    .replace(/[\s\W-]+/g, '-') // Replace spaces and non-word characters with '-'
-                    .replace(/^-+|-+$/g, '');  // Remove leading and trailing '-'
+                    .replace(/[\s\W-]+/g, '-')
+                    .replace(/^-+|-+$/g, '');
             }
         });
     </script>

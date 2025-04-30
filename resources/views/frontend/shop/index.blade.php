@@ -188,7 +188,7 @@
                 </div>
                 <div>
                   <span class="text-secondary">Max Price: </span>
-                  <span class="price-range__max">$700</span>
+                  <span class="price-range__max">$1500</span>
                 </div>
               </div>
             </div>

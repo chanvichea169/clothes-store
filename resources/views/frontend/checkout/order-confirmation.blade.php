@@ -54,7 +54,22 @@
                 </div>
                 <div class="order-info__item">
                     <label>Payment Method</label>
-                    <span>{{ $order->transactions->mode ?? 'N/A' }}</span>
+                    <span>
+                        @php
+                            $paymentMethod = $order->transactions->last()?->mode;
+                        @endphp
+
+                        @switch($paymentMethod)
+                            @case('paypal')
+                                PayPal
+                                @break
+                            @case('cod')
+                                Cash on Delivery
+                                @break
+                            @default
+                                {{ ucfirst($paymentMethod ?? 'N/A') }}
+                        @endswitch
+                    </span>
                 </div>
             </div>
             <div class="checkout__totals-wrapper">

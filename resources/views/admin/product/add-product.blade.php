@@ -144,7 +144,7 @@
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
                     <fieldset class="name">
-                        <div class="body-title mb-10">Regular Price <span class="tf-color-1">*</span></div>
+                        <div class="body-title mb-10">Sale Price <span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter regular price"
                             name="price" tabindex="0" value="{{ old('price') }}" aria-required="true"
                             required="">
@@ -153,7 +153,7 @@
                     <div class="alert alert-danger">{{ $message }}</div>
                     @enderror
                     <fieldset class="name">
-                        <div class="body-title mb-10">Sale Price <span class="tf-color-1">*</span></div>
+                        <div class="body-title mb-10">Regular Price<span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter Cost"
                             name="cost" tabindex="0" value="{{ old('cost') }}" aria-required="true"
                             required="">

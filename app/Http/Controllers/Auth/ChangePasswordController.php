@@ -14,7 +14,7 @@ class ChangePasswordController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $user = auth()->user();
+        $user = auth()->Auth::user();
 
         if (!$user) {
             return redirect()->route('user.change.password')->with('message', 'You must be logged in to change your password.');

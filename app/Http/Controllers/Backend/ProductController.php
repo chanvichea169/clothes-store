@@ -54,7 +54,7 @@ class ProductController extends Controller
             'category_id' => 'required',
             'brand_id' => 'required',
             'gallery' => 'array',
-            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Gallery validation
+            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
         // Create Product
@@ -106,19 +106,15 @@ class ProductController extends Controller
         return redirect()->route('admin.products')->with('success', 'Product added successfully');
     }
 
-    public function edit_product($id)
+    public function edit_product($slug)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::where('slug', $slug)->firstOrFail();
 
-        // Fetch categories
-        $categories = Category::select('id', 'name')
-            ->orderBy('name', 'asc')
-            ->get();
+        $categories = Category::select('id', 'name')->orderBy('name', 'asc')->get();
 
-        // Fetch brands based on the category of the product
         $brands = Brand::join('products', 'brands.id', '=', 'products.brand_id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
-            ->where('categories.name', $product->category->name) // Match category name like your SQL query
+            ->where('categories.name', $product->category->name)
             ->select('brands.id', 'brands.name')
             ->distinct()
             ->orderBy('brands.name', 'asc')
@@ -127,13 +123,13 @@ class ProductController extends Controller
         return view('admin.product.edit-product', compact('product', 'categories', 'brands'));
     }
 
-
-
-    public function update_product(Request $request)
+    public function update_product(Request $request, $slug)
     {
+        $product = Product::where('slug', $slug)->firstOrFail();
+
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:products,slug,'.$request->id,
+            'slug' => 'required|unique:products,slug,' . $product->id,
             'description' => 'required',
             'status' => 'required',
             'price' => 'required',
@@ -144,12 +140,11 @@ class ProductController extends Controller
             'quantity' => 'required',
             'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'gallery' => 'array',
-            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048', // Gallery validation
+            'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'category_id' => 'required',
             'brand_id' => 'required',
         ]);
 
-        $product = Product::findOrFail($request->id);
         $product->name = $request->name;
         $product->slug = $request->slug;
         $product->description = $request->description;
@@ -170,8 +165,8 @@ class ProductController extends Controller
             $product->image = $name;
         }
 
-        $gallery_images = [];
         if ($request->hasFile('gallery')) {
+            $gallery_images = [];
             foreach ($request->file('gallery') as $file) {
                 $name = time() . '.' . $file->extension();
                 $this->GenerateProductThumbnailImage($file, $name);
@@ -185,12 +180,14 @@ class ProductController extends Controller
         return redirect()->route('admin.products')->with('success', 'Product updated successfully');
     }
 
-    public function delete_product($id)
+    public function delete_product($slug)
     {
-        $product = Product::findOrFail($id);
+        $product = Product::where('slug', $slug)->firstOrFail();
         $product->delete();
+
         return redirect()->route('admin.products')->with('success', 'Product deleted successfully');
     }
+
 
     public function GenerateProductThumbnailImage($image, $image_name)
     {

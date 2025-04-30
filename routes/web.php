@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Frontend\PaypalController;
+use App\Http\Controllers\Frontend\CheckoutController;
+use App\Http\Controllers\StripeController;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;

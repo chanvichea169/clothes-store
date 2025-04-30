@@ -33,10 +33,12 @@
         @if(Session::has('error'))
             <h4 class="alert alert-danger text-center">{{ Session::get('error') }}</h4>
         @endif
-        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data" action="{{ route('admin.update.product',['id'=>$product->id]) }}">
+        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data" action="{{ route('admin.update.product',['slug'=>$product->slug]) }}">
+
             @method('PUT')
             @csrf
-            <input type="hidden" name="id" value="{{ $product->id }}">
+            <input type="hidden" name="slug" value="{{ $product->slug }}">
+
             <div class="wg-box">
                 @error('name')
                     <div class="alert alert-danger">{{ $message }}</div>
@@ -162,12 +164,12 @@
 
                 <div class="cols gap22">
                     <fieldset class="name">
-                        <div class="body-title mb-10">Regular Price <span class="tf-color-1">*</span></div>
+                        <div class="body-title mb-10">Sale Price<span class="tf-color-1">*</span></div>
                         <input class="mb-10" type="text" placeholder="Enter regular price"
                             name="price" tabindex="0" value="{{ $product->price }}" aria-required="true" required>
                     </fieldset>
                     <fieldset class="name">
-                        <div class="body-title mb-10">Sale Price <span class="tf-color-1">*</span></div>
+                        <div class="body-title mb-10">Regular Price <sapan class="tf-color-1">*</sapan></div>
                         <input class="mb-10" type="text" placeholder="Enter Cost"
                             name="cost" tabindex="0" value="{{ $product->cost }}" aria-required="true" required>
                     </fieldset>

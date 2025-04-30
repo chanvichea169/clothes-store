@@ -16,8 +16,12 @@
                 <div class="swiper-container">
                   <div class="swiper-wrapper">
                     <div class="swiper-slide product-single__image-item">
-                      <img loading="lazy" class="h-auto" src="{{ asset('uploads/products')}}/{{$product->image }}" width="674"
-                        height="674" alt="" />
+                    @if ($product)
+                        <img loading="lazy" class="h-auto" src="{{ asset('uploads/products/' . $product->image) }}" width="674" height="674" alt="" />
+                    @else
+                        <p>Product not found.</p>
+                    @endif
+
                       <a data-fancybox="gallery" href="{{ asset('uploads/products')}}/{{$product->image }}" data-bs-toggle="tooltip"
                         data-bs-placement="left" title="Zoom">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -38,14 +42,15 @@
                         </div>
                     @endforeach
                     </div>
-                  <div class="swiper-button-prev"><svg width="7" height="11" viewBox="0 0 7 11"
+                <div class="swiper-button-prev"><svg width="7" height="11" viewBox="0 0 7 11"
                       xmlns="http://www.w3.org/2000/svg">
                       <use href="#icon_prev_sm" />
                     </svg></div>
-                  <div class="swiper-button-next"><svg width="7" height="11" viewBox="0 0 7 11"
+                <div class="swiper-button-next"><svg width="7" height="11" viewBox="0 0 7 11"
                       xmlns="http://www.w3.org/2000/svg">
                       <use href="#icon_next_sm" />
-                    </svg></div>
+                    </svg>
+                </div>
                 </div>
               </div>
               <div class="product-single__thumbnail">
@@ -67,22 +72,22 @@
         <div class="col-lg-5">
           <div class="d-flex justify-content-between mb-4 pb-md-2">
             <div class="breadcrumb mb-0 d-none d-md-block flex-grow-1">
-              <a href="#" class="menu-link menu-link_us-s text-uppercase fw-medium">Home</a>
+              <a href="{{ route('home.index') }}" class="menu-link menu-link_us-s text-uppercase fw-medium">Home</a>
               <span class="breadcrumb-separator menu-link fw-medium ps-1 pe-1">/</span>
-              <a href="#" class="menu-link menu-link_us-s text-uppercase fw-medium">The Shop</a>
+              <a href="{{ route('shop.index') }}" class="menu-link menu-link_us-s text-uppercase fw-medium">The Shop</a>
             </div><!-- /.breadcrumb -->
 
             <div
               class="product-single__prev-next d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
-              <a href="#" class="text-uppercase fw-medium"><svg width="10" height="10" viewBox="0 0 25 25"
+              <a href="javascript:void(0);" class="text-uppercase fw-medium"><svg width="10" height="10" viewBox="0 0 25 25"
                   xmlns="http://www.w3.org/2000/svg">
                   <use href="#icon_prev_md" />
                 </svg><span class="menu-link menu-link_us-s">Prev</span></a>
-              <a href="#" class="text-uppercase fw-medium"><span class="menu-link menu-link_us-s">Next</span><svg
+              <a href="javascript:void(0);" class="text-uppercase fw-medium"><span class="menu-link menu-link_us-s">Next</span><svg
                   width="10" height="10" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
                   <use href="#icon_next_md" />
                 </svg></a>
-            </div><!-- /.shop-acs -->
+            </div>
           </div>
           <h1 class="product-single__name">{{ $product->name }}</h1>
           <div class="product-single__rating">
@@ -115,6 +120,7 @@
             </span>
           </div>
           <div class="product-single__short-desc">
+            <h4>Short Description</h4>
             <p>{{ $product->description }}</p>
           </div>
           <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
@@ -139,7 +145,7 @@
             <form action="{{ route('wishlist.remove_from_wishlist', ['rowId' => Cart::instance('wishlist')->content()->where('id', $product->id)->first()->rowId]) }}" method="POST" id="frm-wishlist-remove">
                 @csrf
                 @method('DELETE')
-                <a href="javascript:void(0)" class="menu-link menu-link_us-s add-to-wishlist filled-heart" onclick="document.getElementById('frm-wishlist-remove').submit();"><svg width="16" height="16" viewBox="0 0 20 20"
+                <a href="cc" class="menu-link menu-link_us-s add-to-wishlist filled-heart" onclick="document.getElementById('frm-wishlist-remove').submit();"><svg width="16" height="16" viewBox="0 0 20 20"
                     fill="none" xmlns="http://www.w3.org/2000/svg">
                     <use href="#icon_heart" />
                 </svg><span>Remove from Wishlist</span>
@@ -202,7 +208,7 @@
             </div>
             <div class="meta-item">
               <label>Tags:</label>
-              <span>NA</span>
+              <span>{{ $product->status ?? NA }}</span>
             </div>
           </div>
         </div>
@@ -464,7 +470,7 @@
                       </button>
                       <input type="hidden" name="id" value="{{ $rproduct->id }}">
                       <input type="hidden" name="name" value="{{ $rproduct->name }}">
-                      <input type="hidden" name="quantity" value="1"> <!-- Default quantity -->
+                      <input type="hidden" name="quantity" value="1">
                       <input type="hidden" name="price" value="{{ $rproduct->price ?: $rproduct->cost }}">
                     </form>
                   @endif
@@ -512,5 +518,5 @@
       </div><!-- /.position-relative -->
 
     </section><!-- /.products-carousel container -->
-  </main>
+</main>
 @endsection

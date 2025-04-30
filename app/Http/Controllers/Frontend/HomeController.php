@@ -16,7 +16,22 @@ class HomeController extends Controller
         $slides = Slide::where('status', 1)->get()->take(3);
         $categories = Category::orderBy('name')->get();
         $onSaleProducts = Product::whereNotNull('cost')->where('cost', '<>', '')->inRandomOrder()->take(8)->get();
-        $fProducts = Product::where('featured', 1)->take(8)->get();
+        $fProducts = Product::where('featured', 1)->paginate(8);
         return view('index', compact('slides', 'categories', 'onSaleProducts', 'fProducts'));
     }
+
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+
+        // Search products
+        $products = Product::where('name', 'LIKE', "%{$search}%")
+            ->orWhere('description', 'LIKE', "%{$search}%")
+            ->paginate(12);
+
+
+        return view('/frontend/shop', compact('products', 'search'));
+    }
+
+
 }

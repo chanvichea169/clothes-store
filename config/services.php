@@ -52,9 +52,17 @@ return [
         'secret' => env('PAYPAL_SANDBOX_SECRET'),
         'mode' => env('PAYPAL_SANDBOX_MODE', 'sandbox') ? 'sandbox' : 'live',
     ],
+
     'stripe' => [
-        'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
+        'key' => env('STRIPE_KEY'),
+    ],
+
+
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_TOKEN'),
+        'from' => env('TWILIO_FROM'),
     ],
 
 

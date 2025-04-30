@@ -10,6 +10,7 @@ use Intervention\Image\Laravel\Facades\Image;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Str;
 
+
 class CategoryController extends Controller
 {
     public function categories()
@@ -36,12 +37,12 @@ class CategoryController extends Controller
         $category->slug = Str::slug($request->name);
         $image = $request->file('image');
 
-        if($image){
-            $file_extention = $request->file('image')->extension();
-            $file_name = Carbon::now()->timestamp. '.' .$file_extention;
-            $this->GenerateCategoryThumbnailImage( $image, $file_name);
+        if ($image) {
+            $file_extension = $image->extension();
+            $file_name = Carbon::now()->timestamp . '.' . $file_extension;
+            $this->GenerateCategoryThumbnailImage($image, $file_name);
             $category->image = $file_name;
-        }else{
+        } else {
             return redirect()->back()->with('error', 'Please select a valid image file');
         }
 
@@ -50,10 +51,9 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories')->with('success', 'Category added successfully');
     }
 
-
-    public function edit_category($id)
+    public function edit_category($slug)
     {
-        $category = Category::find($id);
+        $category = Category::where('slug', $slug)->firstOrFail();
         return view('admin.category.edit-category', compact('category'));
     }
 
@@ -61,23 +61,23 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required',
-            'slug' => 'required|unique:categories,slug,'.$request->id,
+            'slug' => 'required|unique:categories,slug,' . $request->id,
             'image' => 'mimes:jpeg,png,jpg,svg|max:2048',
         ]);
 
-        $category = Category::find($request->id);
+        $category = Category::findOrFail($request->id); // You should still find by ID if you are updating using the ID from the form.
         $category->name = $request->name;
         $category->slug = Str::slug($request->name);
         $image = $request->file('image');
 
-        if($image){
-            if($request->hasFile('image')){
-                if(File::exists(public_path('uploads/brands/'. $category->image))){
-                    File::delete(public_path('uploads/brands/'. $category->image));
+        if ($image) {
+            if ($request->hasFile('image')) {
+                if (File::exists(public_path('uploads/brands/' . $category->image))) {
+                    File::delete(public_path('uploads/brands/' . $category->image));
                 }
-                $file_extention = $request->file('image')->extension();
-                $file_name = Carbon::now()->timestamp. '.' .$file_extention;
-                $this->GenerateBrandThumbnailImage($image, $file_name);
+                $file_extension = $image->extension();
+                $file_name = Carbon::now()->timestamp . '.' . $file_extension;
+                $this->GenerateCategoryThumbnailImage($image, $file_name);
                 $category->image = $file_name;
             }
         }
@@ -86,11 +86,11 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories')->with('success', 'Category updated successfully');
     }
 
-    public function delete_category($id)
+    public function delete_category($slug)
     {
-        $category = Category::find($id);
-        if(File::exists(public_path('uploads/categories/'.$category->image))){
-            File::delete(public_path('uploads/categories/'.$category->image));
+        $category = Category::where('slug', $slug)->firstOrFail();
+        if (File::exists(public_path('uploads/categories/' . $category->image))) {
+            File::delete(public_path('uploads/categories/' . $category->image));
         }
         $category->delete();
         return redirect()->route('admin.categories')->with('success', 'Category deleted successfully');
@@ -98,12 +98,11 @@ class CategoryController extends Controller
 
     public function GenerateCategoryThumbnailImage($image, $image_name)
     {
-
         $destinationPath = public_path('uploads/categories');
         $img = Image::read($image->path());
-        $img->cover(124, 124,"top");
+        $img->cover(124, 124, "top");
         $img->resize(124, 124, function ($constraint) {
             $constraint->aspectRatio();
-        })->save($destinationPath. '/' .$image_name);
+        })->save($destinationPath . '/' . $image_name);
     }
 }

@@ -21,12 +21,15 @@ class Order extends Model
         return $this->hasMany(OrderItem::class);
     }
 
-    // public function transaction(){
-    //     return $this->belongsTo(Transaction::class);
-    // }
+
     public function transactions()
     {
-        return $this->hasOne(Transaction::class);
+        return $this->hasMany(Transaction::class);
+    }
+
+    public function shipment()
+    {
+        return $this->hasOne(Shipment::class);
     }
 
 }

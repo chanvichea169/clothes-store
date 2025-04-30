@@ -222,6 +222,7 @@
         fill="currentColor" />
     </symbol>
 </svg>
+
 <style>
     #header {
     padding-top: 8px;
@@ -232,6 +233,9 @@
     max-width: 220px;
     }
 </style>
+
+
+
 <div class="header-mobile header_sticky">
     <div class="container d-flex align-items-center h-100">
     <a class="mobile-nav-activator d-block position-relative" href="#">
@@ -257,25 +261,24 @@
     </a>
 </div>
 
-    <nav
-    class="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto">
-    <div class="container">
-        <form action="#" method="GET" class="search-field position-relative mt-4 mb-3">
-        <div class="position-relative">
-            <input class="search-field__input w-100 border rounded-1" type="text" name="search-keyword"
-            placeholder="Search products" />
-            <button class="btn-icon search-popup__submit pb-0 me-2" type="submit">
-            <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-                <use href="#icon_search" />
-            </svg>
-            </button>
-            <button class="btn-icon btn-close-lg search-popup__reset pb-0 me-2" type="reset"></button>
-        </div>
+    <nav class="header-mobile__navigation navigation d-flex flex-column w-100 position-absolute top-100 bg-body overflow-auto">
+        <div class="container">
+        <form action="{{ route('shop.index') }}" method="GET" class="search-field position-relative mt-4 mb-3">
+            <div class="position-relative">
+                <input class="search-field__input w-100 border rounded-1" type="text" name="search-keyword"
+                placeholder="Search products" />
+                <button class="btn-icon search-popup__submit pb-0 me-2" type="submit">
+                <svg class="d-block" width="20" height="20" viewBox="0 0 20 20" fill="none"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <use href="#icon_search" />
+                </svg>
+                </button>
+                <button class="btn-icon btn-close-lg search-popup__reset pb-0 me-2" type="reset"></button>
+            </div>
 
-        <div class="position-absolute start-0 top-100 m-0 w-100">
-            <div class="search-result"></div>
-        </div>
+            <div class="position-absolute start-0 top-100 m-0 w-100">
+                <div class="search-result"></div>
+            </div>
         </form>
     </div>
 
@@ -423,7 +426,7 @@
                     </div>
 
                     <div class="search-popup js-hidden-content">
-                        <form action="#" method="GET" class="search-field container">
+                        <form action="{{ route('shop.search') }}" method="GET" class="search-field container">
                             <p class="text-uppercase text-secondary fw-medium mb-4">What are you looking for?</p>
                             <div class="position-relative">
                                 <input class="search-field__input search-popup__input w-100 fw-medium" type="text"
@@ -440,13 +443,11 @@
                             <div class="search-popup__results">
                                 <div class="sub-menu search-suggestion">
                                     <h6 class="sub-menu__title fs-base">Quicklinks</h6>
-                                    <ul class="sub-menu__list list-unstyled">
-                                        <li class="sub-menu__item"><a href="shop2.html" class="menu-link menu-link_us-s">New Arrivals</a></li>
-                                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Dresses</a></li>
-                                        <li class="sub-menu__item"><a href="shop3.html" class="menu-link menu-link_us-s">Accessories</a></li>
-                                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Footwear</a></li>
-                                        <li class="sub-menu__item"><a href="#" class="menu-link menu-link_us-s">Sweatshirt</a></li>
-                                    </ul>
+                                    @foreach ($categories as $category)
+                                        <ul class="sub-menu__list list-unstyled">
+                                            <li class="sub-menu__item"><a href="{{ route('shop.index',['category' => $category->slug]) }}" class="menu-link menu-link_us-s">{{ $category->name }}</a></li>
+                                        </ul>
+                                    @endforeach
                                 </div>
                                 <div class="search-result row row-cols-5"></div>
                             </div>
@@ -524,78 +525,74 @@
                         </a>
                     </div>
                 @else
-                    <div class="header-tools__item dropdown ms-0 mb-2">
-                        <button class="btn dropdown-toggle d-flex align-items-center border-0 bg-transparent p-0 hover-primary focus-primary"
-                                id="userDropdownMenu"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                            <div class="d-flex align-items-center gap-2">
-                                <div class="avatar avatar-sm">
-                                    <img src="{{ Auth::user()->avatar ? asset('storage/'.Auth::user()->avatar) : asset('images/avatar/user-1.png') }}"
-                                        alt="{{ Auth::user()->name }}"
-                                        class="rounded-circle">
-                                </div>
-                                <span class="fw-semibold d-none d-md-inline text-dark">{{ ucfirst(Auth::user()->name) }}</span>
+                <div class="header-tools__item dropdown ms-0 mb-2">
+                    <button class="btn dropdown-toggle d-flex align-items-center border-0 bg-transparent p-0 hover-primary focus-primary"
+                            id="userDropdownMenu"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar avatar-sm">
+                                <img src="{{ Auth::user()->avatar ? asset('storage/'.Auth::user()->avatar) : asset('images/avatar/user-1.png') }}"
+                                    alt="{{ Auth::user()->name }}"
+                                    class="rounded-circle">
                             </div>
-                        </button>
-                        <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2 border-0 rounded-3" aria-labelledby="userDropdownMenu">
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('user.index') }}">
-                                    <span class="material-symbols-rounded me-2">
-                                        person
-                                    </span> My Account
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('cart.index') }}">
-                                    <span class="material-symbols-rounded me-2">
-                                        shopping_cart
-                                    </span> My Orders
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('user.change.password') }}">
-                                    <span class="material-symbols-rounded me-2">
-                                        settings
-                                    </span> Account Settings
-                                </a>
-                            </li>
-                            <li>
-                                <a class="dropdown-item d-flex justify-content-between align-items-center py-2 px-3 hover-bg-light" href="{{ route('wishlist.index') }}">
-                                    <div class="d-flex align-items-center">
-                                        <span class="material-symbols-rounded me-2">
-                                            favorite
-                                        </span>Wishlist
-                                    </div>
-                                    @if(Cart::instance('wishlist')->content()->count() > 0)
-                                        <span class="badge bg-primary rounded-pill">{{ Cart::instance('wishlist')->content()->count() }}</span>
-                                    @endif
-                                </a>
-                            </li>
-                            @if(Auth::user()->utype === 'ADM')
-                                <li><hr class="dropdown-divider"></li>
-                                <li>
-                                    <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('admin.index') }}">
-                                        <span class="material-symbols-rounded me-2">
-                                            dashboard
-                                        </span> Admin Dashboard
-                                    </a>
-                                </li>
-                            @endif
+                            <span class="fw-semibold d-none d-md-inline text-dark">{{ ucfirst(Auth::user()->name) }}</span>
+                        </div>
+                    </button>
+
+                    <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2 border-0 rounded-3" aria-labelledby="userDropdownMenu">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('user.index') }}">
+                                <span class="material-symbols-rounded me-2">person</span> My Account
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('user.orders') }}">
+                                <span class="material-symbols-rounded me-2">shopping_cart</span> My Orders
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('user.change.password') }}">
+                                <span class="material-symbols-rounded me-2">lock</span> Change Password
+                            </a>
+                        </li>
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item d-flex justify-content-between align-items-center py-2 px-3 hover-bg-light" href="{{ route('wishlist.index') }}">
+                                <div class="d-flex align-items-center">
+                                    <span class="material-symbols-rounded me-2">favorite</span> Wishlist
+                                </div>
+                                @if(Cart::instance('wishlist')->content()->count() > 0)
+                                    <span class="badge bg-primary rounded-pill">{{ Cart::instance('wishlist')->content()->count() }}</span>
+                                @endif
+                            </a>
+                        </li>
+
+                        @if(Auth::user()->utype === 'ADM')
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light hover-text-danger" href="{{ route('logout') }}"
-                                onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <span class="material-symbols-rounded me-2">
-                                    logout
-                                </span> Logout
+                                <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('admin.index') }}">
+                                    <span class="material-symbols-rounded me-2">dashboard</span> Admin Dashboard
                                 </a>
-                                <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                    @csrf
-                                </form>
                             </li>
-                        </ul>
-                    </div>
+                        @endif
+
+                        <li><hr class="dropdown-divider"></li>
+
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light hover-text-danger" href="{{ route('logout') }}"
+                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <span class="material-symbols-rounded me-2">logout</span> Logout
+                            </a>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
+                                @csrf
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+
                 @endguest
             </div>
         </div>

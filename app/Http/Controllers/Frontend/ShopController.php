@@ -76,4 +76,43 @@ class ShopController extends Controller
         return view('frontend.shop.details', compact('product', 'rproducts'));
     }
 
+    public function search(Request $request)
+    {
+        $search = $request->input('search');
+        $size = $request->query('size') ? $request->query('size') : 12;
+        $o_column = "";
+        $o_order = "";
+        $order = $request->query('order') ? $request->query('order') : -1;
+
+        switch ($order) {
+            case 1:
+                $o_column = "created_at";
+                $o_order = "desc";
+                break;
+            case 2:
+                $o_column = "created_at";
+                $o_order = "asc";
+                break;
+            case 3:
+                $o_column = "price";
+                $o_order = "asc";
+                break;
+            case 4:
+                $o_column = "price";
+                $o_order = "desc";
+                break;
+            default:
+                $o_column = "id";
+                $o_order = "desc";
+        }
+
+        $products = Product::where('name', 'LIKE', "%{$search}%")
+            ->orWhere('description', 'LIKE', "%{$search}%")
+            ->orderBy($o_column, $o_order)
+            ->paginate($size);
+
+        return view('frontend.shop.index', compact('products', 'search', 'size', 'order'));
+    }
+
+
 }

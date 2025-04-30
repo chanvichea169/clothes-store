@@ -101,7 +101,7 @@
                             </div>
 
                             <div id="card-form" class="mt-4" style="display: none;">
-                                <div id="card-element"></div>
+                                <div id="card-element" class="form-control p-2" style="height: 40px;"></div>
                                 <div id="card-errors" role="alert" class="text-danger mt-2"></div>
                             </div>
 
@@ -112,7 +112,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="btn btn-primary btn-checkout">PLACE ORDER</button>
+                        <button type="submit" class="btn btn-primary btn-checkout" id="submit-btn">PLACE ORDER</button>
                     </div>
                 </div>
             </div>
@@ -121,7 +121,7 @@
 </main>
 @endsection
 
-@section('scripts')
+@push('scripts')
 <script src="https://www.paypal.com/sdk/js?client-id={{ config('services.paypal.client_id') }}&currency=USD"></script>
 <script src="https://js.stripe.com/v3/"></script>
 <script>
@@ -133,13 +133,33 @@
         const cardForm = document.getElementById('card-form');
         const placeOrderBtn = document.querySelector('.btn-checkout');
         const form = document.getElementById('checkout-form');
+        const submitBtn = document.getElementById('submit-btn');
 
-        // Show/Hide Payment Sections
+
+        const stripe = Stripe('{{ config('services.stripe.key') }}');
+        const elements = stripe.elements();
+        const cardElement = elements.create('card', {
+            style: {
+                base: {
+                    fontSize: '16px',
+                    color: '#32325d',
+                    '::placeholder': {
+                        color: '#aab7c4'
+                    }
+                },
+                invalid: {
+                    color: '#fa755a',
+                    iconColor: '#fa755a'
+                }
+            }
+        });
+        cardElement.mount('#card-element');
+
         function togglePaymentUI() {
             if (paypalRadio.checked) {
                 paypalContainer.style.display = 'block';
                 cardForm.style.display = 'none';
-                placeOrderBtn.style.display = 'none';
+                placeOrderBtn.style.display = 'block';
             } else if (cardRadio.checked) {
                 cardForm.style.display = 'block';
                 paypalContainer.style.display = 'none';
@@ -155,9 +175,8 @@
             radio.addEventListener('change', togglePaymentUI);
         });
 
-        togglePaymentUI(); // Initial state
+        togglePaymentUI();
 
-        // PayPal Buttons
         paypal.Buttons({
             createOrder: (data, actions) => {
                 return actions.order.create({
@@ -191,31 +210,49 @@
             }
         }).render('#paypal-button-container');
 
-        // Stripe Setup
-        const stripe = Stripe('{{ config('services.stripe.key') }}');
-        const elements = stripe.elements();
-        const cardElement = elements.create('card');
-        cardElement.mount('#card-element');
-
         form.addEventListener('submit', async (e) => {
-            if (!cardRadio.checked) return; // Submit directly for COD
+            if (!cardRadio.checked) return;
 
             e.preventDefault();
+            submitBtn.disabled = true;
 
-            const { token, error } = await stripe.createToken(cardElement);
+            const {paymentMethod, error} = await stripe.createPaymentMethod({
+                type: 'card',
+                card: cardElement
+            });
 
             if (error) {
-                document.getElementById('card-errors').textContent = error.message;
+                alert(error.message);
+                submitBtn.disabled = false;
             } else {
-                let input = document.createElement('input');
-                input.setAttribute('type', 'hidden');
-                input.setAttribute('name', 'stripeToken');
-                input.setAttribute('value', token.id);
-                form.appendChild(input);
-                form.submit();
+                const formData = new FormData(form);
+                formData.append('payment_method_id', paymentMethod.id);
+
+                fetch("{{ route('checkout.place.an.order') }}", {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '/order-confirmation';
+                    } else {
+                        alert('Something went wrong');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Payment processing failed.');
+                    submitBtn.disabled = false;
+                })
+                .finally(() => {
+                    submitBtn.disabled = false;
+                });
             }
         });
     });
 </script>
-@endsection
-
+@endpush

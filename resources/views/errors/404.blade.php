@@ -245,7 +245,7 @@
             Oops! The page you're looking for doesn't exist or has been moved.
         </div>
         <div class="illustration">
-            <img src="{{ asset('assets/images/404.jpg') }}" alt="Page not found" />
+            <img src="{{ asset('assets/images/404.png') }}" alt="Page not found" />
         </div>
         <a href="{{ url('/') }}" class="btn-home">Go back to homepage</a>
     </div>

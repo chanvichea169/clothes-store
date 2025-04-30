@@ -52,6 +52,11 @@ class User extends Authenticatable
         ];
     }
 
+    // In User.php
+    public function sendPasswordResetNotification($token)
+    {
+        $this->notify(new \App\Notifications\CustomResetPassword($token));
+    }
     public function orders()
     {
         return $this->hasMany(Order::class);

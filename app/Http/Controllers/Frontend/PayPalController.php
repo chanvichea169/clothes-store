@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Http;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Transaction;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Surfsidemedia\Shoppingcart\Facades\Cart;
 
 class PaypalController extends Controller
@@ -24,9 +26,9 @@ class PaypalController extends Controller
         $clientId = config('paypal.client_id');
         $secret = config('paypal.secret');
 
-        // Get the total from the session
-        $total = Session::get('checkout.total', 0); // default to 0 if not set
-        $totalFormatted = number_format((float) $total, 2, '.', ''); // ensure it's a string with 2 decimal places
+
+        $total = Session::get('checkout.total', 0);
+        $totalFormatted = number_format((float) $total, 2, '.', '');
 
         $tokenResponse = Http::withBasicAuth($clientId, $secret)
             ->asForm()
@@ -104,49 +106,81 @@ class PaypalController extends Controller
 
     public function success(Request $request)
     {
-        if (!Session::has('pending_order')) {
-            return redirect()->route('cart.index')->with('error', 'Session expired. Please try again.');
-        }
+        DB::beginTransaction();
 
-        $pending = Session::get('pending_order');
+        try {
 
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'subtotal' => $pending['checkout']['subtotal'],
-            'discount' => $pending['checkout']['discounts'],
-            'tax' => $pending['checkout']['tax'],
-            'total' => $pending['checkout']['total'],
-            'name' => $pending['address']['name'],
-            'phone' => $pending['address']['phone'],
-            'email' => $pending['address']['email'],
-            'address' => $pending['address']['address'],
-            'city' => $pending['address']['city'],
-            'zip' => $pending['address']['zip'],
-            'state' => $pending['address']['state'],
-            'landmark' => $pending['address']['landmark'],
-        ]);
+            if (!Session::has('pending_order')) {
+                throw new \Exception('Session expired. Please try again.');
+            }
 
-        foreach ($pending['cart_content'] as $item) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $item['id'],
-                'price' => $item['price'],
-                'quantity' => $item['qty'],
+            $pending = Session::get('pending_order');
+
+
+            if (!isset($pending['checkout'], $pending['address'], $pending['cart_content'])) {
+                throw new \Exception('Invalid order data.');
+            }
+
+
+            $order = Order::create([
+                'user_id' => Auth::id(),
+                'subtotal' => $pending['checkout']['subtotal'] ?? 0,
+                'discount' => $pending['checkout']['discount'] ?? 0,
+                'tax' => $pending['checkout']['tax'] ?? 0,
+                'total' => $pending['checkout']['total'] ?? 0,
+                'name' => $pending['address']['name'] ?? '',
+                'phone' => $pending['address']['phone'] ?? '',
+                'email' => $pending['address']['email'] ?? '',
+                'address' => $pending['address']['address'] ?? '',
+                'city' => $pending['address']['city'] ?? '',
+                'zip' => $pending['address']['zip'] ?? '',
+                'state' => $pending['address']['state'] ?? '',
+                'landmark' => $pending['address']['landmark'] ?? '',
+                'payment_method' => 'paypal',
+                'payment_status' => 'completed',
             ]);
+
+
+            foreach ($pending['cart_content'] as $item) {
+                OrderItem::create([
+                    'order_id' => $order->id,
+                    'product_id' => $item['id'],
+                    'price' => $item['price'],
+                    'quantity' => $item['qty'],
+                    'name' => $item['name'],
+                ]);
+            }
+
+
+            Transaction::create([
+                'user_id' => Auth::id(),
+                'order_id' => $order->id,
+                'mode' => 'paypal',
+                'status' => 'completed',
+                'amount' => $pending['checkout']['total'] ?? $order->total,
+                'transaction_id' => $request->input('paymentId') ?? 'PAYPAL-'.uniqid(),
+                'currency' => 'USD',
+                'payment_details' => json_encode($request->all()),
+            ]);
+
+
+            Cart::instance('cart')->destroy();
+            Session::forget(['checkout', 'coupon', 'discounts', 'pending_order']);
+            Session::put('order_completed', true);
+            Session::put('completed_order_id', $order->id);
+
+            DB::commit();
+
+            return redirect()->route('checkout.order.confirmation')
+                   ->with('success', 'Your payment was successful!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('PayPal payment processing failed: '.$e->getMessage());
+
+            return redirect()->route('cart.index')
+                   ->with('error', 'Payment processing failed: '.$e->getMessage());
         }
-
-        Transaction::create([
-            'user_id' => Auth::id(),
-            'order_id' => $order->id,
-            'mode' => 'paypal',
-            'status' => 'completed',
-        ]);
-
-        Cart::instance('cart')->destroy();
-        Session::forget(['checkout', 'coupon', 'discounts', 'pending_order']);
-        Session::put('order_id', $order->id);
-
-        return redirect()->route('checkout.order.confirmation');
     }
 
     public function cancel()

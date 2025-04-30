@@ -9,7 +9,7 @@
             </a>
         </div>
         <p class="footer-address">123 Beach Avenue, ChannVichea City, CA 00000</p>
-        <p class="m-0"><strong class="fw-medium">ChannVichea169@gmail.com</strong></p>
+        <p class="m-0"><strong class="fw-medium">channvichea169@gmail.com</strong></p>
         <p><strong class="fw-medium">+885 976583595</strong></p>
 
         <ul class="social-links list-unstyled d-flex flex-wrap mb-0">

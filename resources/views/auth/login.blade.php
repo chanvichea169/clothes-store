@@ -8,7 +8,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Clothes-Shop - Login</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
-        <!-- Add these after your other styles -->
+    <!-- Add Font Awesome for eye icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Add these after your other styles -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
@@ -152,6 +154,31 @@
         .form-group input::placeholder {
             color: var(--text-light);
             opacity: 0.6;
+        }
+
+        /* Password toggle specific styles */
+        .input-group {
+            position: relative;
+        }
+
+        .input-group input {
+            padding-right: 40px !important;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none !important;
+            border: none !important;
+            color: var(--text-light);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .toggle-password:hover {
+            color: var(--primary);
         }
 
         .form-options {
@@ -371,7 +398,12 @@
                 @enderror
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" placeholder="••••••••" required>
+                    <div class="input-group">
+                        <input type="password" id="password" name="password" placeholder="••••••••" required>
+                        <span class="toggle-password">
+                            <i class="far fa-eye" id="togglePassword"></i>
+                        </span>
+                    </div>
                 </div>
 
                 <div class="form-options">
@@ -379,7 +411,7 @@
                         <input type="checkbox" id="remember" name="remember">
                         <label for="remember">Remember me</label>
                     </div>
-                    <a href="#" class="forgot-password">Forgot password?</a>
+                    <a href="{{ route('password.request') }}" class="forgot-password">Forgot password?</a>
                 </div>
 
                 <button type="submit" class="login-btn">Login</button>
@@ -408,6 +440,22 @@
             </form>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = document.querySelector('#togglePassword');
+            const password = document.querySelector('#password');
+
+            togglePassword.addEventListener('click', function() {
+                // Toggle the type attribute
+                const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                password.setAttribute('type', type);
+
+                // Toggle the eye icon
+                this.classList.toggle('fa-eye');
+                this.classList.toggle('fa-eye-slash');
+            });
+        });
+    </script>
 </body>
 </html>
-

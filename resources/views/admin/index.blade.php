@@ -147,7 +147,7 @@
                             </div>
                         </div>
                         <div class="flex items-center gap10">
-                            <h4>${{ $TotalAmount }}</h4>
+                            <h4>${{ number_format($TotalAmount, 2) }}</h4>
                         </div>
                     </div>
                     <div>
@@ -158,29 +158,29 @@
                             </div>
                         </div>
                         <div class="flex items-center gap10">
-                            <h4>${{ $TotalOrderedAmount }}</h4>
+                            <h4>${{ number_format($TotalOrderedAmount, 2) }}</h4>
                         </div>
                     </div>
                     <div>
                         <div class="mb-2">
                             <div class="block-legend">
-                                <div class="dot t2"></div>
+                                <div class="dot t3"></div>
                                 <div class="text-tiny">Delivered</div>
                             </div>
                         </div>
                         <div class="flex items-center gap10">
-                            <h4>${{ $TotalDeliveredAmount }}</h4>
+                            <h4>${{ number_format($TotalDeliveredAmount, 2) }}</h4>
                         </div>
                     </div>
                     <div>
                         <div class="mb-2">
                             <div class="block-legend">
-                                <div class="dot t2"></div>
+                                <div class="dot t4"></div>
                                 <div class="text-tiny">Canceled</div>
                             </div>
                         </div>
                         <div class="flex items-center gap10">
-                            <h4>${{ $TotalCanceledAmount }}</h4>
+                            <h4>${{ number_format($TotalCanceledAmount, 2) }}</h4>
                         </div>
                     </div>
                 </div>
@@ -268,11 +268,8 @@
 @push('scripts')
 <script>
     (function ($) {
-
         var tfLineChart = (function () {
-
             var chartBar = function () {
-
                 var options = {
                     series: [{
                         name: 'Total',
@@ -280,8 +277,7 @@
                     }, {
                         name: 'Pending',
                         data: [{{ $OrderedAmountM }}]
-                    },
-                    {
+                    }, {
                         name: 'Delivered',
                         data: [{{ $DeliveredAmountM }}]
                     }, {
@@ -294,11 +290,12 @@
                         toolbar: {
                             show: false,
                         },
+                        stacked: false
                     },
                     plotOptions: {
                         bar: {
                             horizontal: false,
-                            columnWidth: '10px',
+                            columnWidth: '55%',
                             endingShape: 'rounded'
                         },
                     },
@@ -306,22 +303,33 @@
                         enabled: false
                     },
                     legend: {
-                        show: false,
+                        position: 'top',
+                        horizontalAlign: 'left',
+                        offsetX: 40
                     },
                     colors: ['#2377FC', '#FFA500', '#078407', '#FF0000'],
                     stroke: {
-                        show: false,
+                        show: true,
+                        width: 2,
+                        colors: ['transparent']
                     },
                     xaxis: {
+                        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                         labels: {
                             style: {
                                 colors: '#212529',
                             },
                         },
-                        categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
                     },
                     yaxis: {
-                        show: false,
+                        title: {
+                            text: '$ (amount)'
+                        },
+                        labels: {
+                            formatter: function (value) {
+                                return "$" + value.toFixed(2);
+                            }
+                        }
                     },
                     fill: {
                         opacity: 1
@@ -329,39 +337,36 @@
                     tooltip: {
                         y: {
                             formatter: function (val) {
-                                return "$ " + val + ""
+                                return "$ " + val.toFixed(2)
                             }
                         }
                     }
                 };
 
-                chart = new ApexCharts(
+                var chart = new ApexCharts(
                     document.querySelector("#line-chart-8"),
                     options
                 );
+
                 if ($("#line-chart-8").length > 0) {
                     chart.render();
                 }
             };
 
-            /* Function ============ */
             return {
-                init: function () { },
-
+                init: function () {},
                 load: function () {
                     chartBar();
                 },
-                resize: function () { },
+                resize: function () {},
             };
         })();
 
-        jQuery(document).ready(function () { });
-
+        jQuery(document).ready(function () {});
         jQuery(window).on("load", function () {
             tfLineChart.load();
         });
-
-        jQuery(window).on("resize", function () { });
+        jQuery(window).on("resize", function () {});
     })(jQuery);
 </script>
 @endpush

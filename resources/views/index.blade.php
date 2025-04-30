@@ -418,14 +418,45 @@
           </div>
           @endforeach
         </div><!-- /.row -->
+        <input type="hidden" id="page" value="1">
         <div class="text-center mt-2">
-          <a class="btn-link btn-link_lg default-underline text-uppercase fw-medium" href="#">Load More</a>
+            <button id="load-more-btn" class="btn-link btn-link_lg default-underline text-uppercase fw-medium">
+              Load More
+            </button>
         </div>
       </section>
     </div>
     <div class="mb-3 mb-xl-5 pt-1 pb-4">
     </div>
 </main>
-
-
 @endsection
+@push('scripts')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $('#load-more-btn').on('click', function () {
+    var page = parseInt($('#page').val()) + 1;
+    $.ajax({
+      url: "?page=" + page,
+      type: 'get',
+      beforeSend: function () {
+        $('#load-more-btn').text('Loading...');
+      }
+    })
+    .done(function (data) {
+      let html = $(data).find("#product-list").html();
+      if (html.trim().length == 0) {
+        $('#load-more-btn').text('No more products');
+        $('#load-more-btn').prop('disabled', true);
+        return;
+      }
+      $('#product-list').append(html);
+      $('#page').val(page);
+      $('#load-more-btn').text('Load More');
+    })
+    .fail(function () {
+      alert('Something went wrong. Please try again later.');
+      $('#load-more-btn').text('Load More');
+    });
+  });
+</script>
+@endpush

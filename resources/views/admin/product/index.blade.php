@@ -91,12 +91,12 @@
                             <td>{{ $product->quantity }}</td>
                             <th>
                                 <div class="list-icon-function">
-                                    <a href="{{ route('admin.edit.product', $product->id) }}">
+                                    <a href="{{ route('admin.edit.product', ['slug'=>$product->slug]) }}">
                                         <div class="item edit">
                                             <i class="fa-regular fa-pen-to-square"></i>
                                         </div>
                                     </a>
-                                    <form action="{{ route('admin.delete.product', $product->id) }}" method="POST">
+                                    <form action="{{ route('admin.delete.product', ['slug'=>$product->slug]) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
                                         <div class="item text-danger delete">
