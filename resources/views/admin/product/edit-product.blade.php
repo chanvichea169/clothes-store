@@ -1,9 +1,8 @@
 @extends('admin.layouts.master')
-@section('title', ' - Edit_Product')
+@section('title', ' - Edit Product')
 @section('content')
 <!-- main-content-wrap -->
 <div class="main-content-inner">
-    <!-- main-content-wrap -->
     <div class="main-content-wrap">
         <div class="flex items-center flex-wrap justify-between gap20 mb-27">
             <h3>Product Information</h3>
@@ -29,104 +28,113 @@
                 </li>
             </ul>
         </div>
-        <!-- form-add-product -->
-        @if(Session::has('error'))
-            <h4 class="alert alert-danger text-center">{{ Session::get('error') }}</h4>
-        @endif
-        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data" action="{{ route('admin.update.product',['slug'=>$product->slug]) }}">
 
+        @if($errors->any())
+            <div class="alert alert-danger">
+                <ul>
+                    @foreach($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
+        @if(Session::has('error'))
+            <div class="alert alert-danger">{{ Session::get('error') }}</div>
+        @endif
+
+        <form class="tf-section-2 form-add-product" method="POST" enctype="multipart/form-data" action="{{ route('admin.update.product',['slug'=>$product->slug]) }}">
             @method('PUT')
             @csrf
             <input type="hidden" name="slug" value="{{ $product->slug }}">
 
             <div class="wg-box">
-                @error('name')
-                    <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
                 <fieldset class="name">
                     <div class="body-title mb-10">Product name <span class="tf-color-1">*</span></div>
-                    <input class="mb-10" type="text" placeholder="Enter product name"
-                        name="name" tabindex="0" value="{{ old('name', $product->name) }}" aria-required="true" required="">
+                    <input class="mb-10 @error('name') is-invalid @enderror" type="text" placeholder="Enter product name"
+                        name="name" value="{{ old('name', $product->name) }}" required>
+                    @error('name')
+                        <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                    @enderror
                     <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
                 </fieldset>
 
-                @error('slug')
-                    <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
                 <fieldset class="name">
                     <div class="body-title mb-10">Slug <span class="tf-color-1">*</span></div>
-                    <input class="mb-10" type="text" placeholder="Enter product slug"
-                        name="slug" tabindex="0" value="{{  $product->slug }}" aria-required="true" required="">
-                    <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
+                    <input class="mb-10 @error('slug') is-invalid @enderror" type="text" placeholder="Enter product slug"
+                        name="slug" value="{{ old('slug', $product->slug) }}" required>
+                    @error('slug')
+                        <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                    @enderror
+                    <div class="text-tiny">Do not exceed 100 characters when entering the product slug.</div>
                 </fieldset>
 
-                @error('category_id')
-                    <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
                 <div class="gap22 cols">
                     <fieldset class="category">
                         <div class="body-title mb-10">Category <span class="tf-color-1">*</span></div>
                         <div class="select">
-                            <select class="" name="category_id" required>
-                                <option>Choose category</option>
+                            <select class="@error('category_id') is-invalid @enderror" name="category_id" required>
+                                <option value="">Choose category</option>
                                 @foreach($categories as $category)
                                     <option value="{{ $category->id }}"
-                                        {{ $product->category_id == $category->id ? 'selected' : '' }}>
+                                        {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
                                         {{ $category->name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
+                        @error('category_id')
+                            <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                        @enderror
                     </fieldset>
 
-                    @error('brand_id')
-                        <div class="alert alert-danger">{{ $message }}</div>
-                    @enderror
                     <fieldset class="brand">
                         <div class="body-title mb-10">Brand <span class="tf-color-1">*</span></div>
                         <div class="select">
-                            <select class="" name="brand_id" required>
-                                <option>Choose Brand</option>
+                            <select class="@error('brand_id') is-invalid @enderror" name="brand_id" required>
+                                <option value="">Choose Brand</option>
                                 @foreach($brands as $brand)
                                     <option value="{{ $brand->id }}"
-                                        {{ $product->brand_id == $brand->id ? 'selected' : '' }}>
+                                        {{ old('brand_id', $product->brand_id) == $brand->id ? 'selected' : '' }}>
                                         {{ $brand->name }}
                                     </option>
                                 @endforeach
                             </select>
                         </div>
+                        @error('brand_id')
+                            <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                        @enderror
                     </fieldset>
                 </div>
 
-                @error('status')
-                    <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
                 <fieldset class="shortdescription">
                     <div class="body-title mb-10">Status <span class="tf-color-1">*</span></div>
-                    <textarea class="mb-10 ht-150" name="status" placeholder="Status" tabindex="0" aria-required="true" required>{{ old('status', $product->status) }}</textarea>
-                    <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
+                    <textarea class="mb-10 ht-150 @error('status') is-invalid @enderror" name="status" placeholder="Status" required>{{ old('status', $product->status) }}</textarea>
+                    @error('status')
+                        <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                    @enderror
+                    <div class="text-tiny">Enter the product status.</div>
                 </fieldset>
 
-                @error('description')
-                    <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
                 <fieldset class="description">
                     <div class="body-title mb-10">Description <span class="tf-color-1">*</span></div>
-                    <textarea class="mb-10" name="description" placeholder="Description" tabindex="0" aria-required="true" required>{{ $product->description }}</textarea>
-                    <div class="text-tiny">Do not exceed 100 characters when entering the product name.</div>
+                    <textarea class="mb-10 @error('description') is-invalid @enderror" name="description" placeholder="Description" required>{{ old('description', $product->description) }}</textarea>
+                    @error('description')
+                        <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                    @enderror
+                    <div class="text-tiny">Enter detailed product description.</div>
                 </fieldset>
             </div>
 
             <div class="wg-box">
-
                 <fieldset>
                     <div class="body-title">Upload images <span class="tf-color-1">*</span></div>
                     <div class="upload-image flex-grow">
-                    @if($product->image)
-                        <div class="item" id="imgpreview">
-                            <img src="{{ asset('uploads/products/' . $product->image) }}" class="effect8" alt="{{ $product->name }}">
-                        </div>
-                    @endif
+                        @if($product->image)
+                            <div class="item" id="imgpreview">
+                                <img src="{{ asset('uploads/products/' . $product->image) }}" class="effect8" alt="{{ $product->name }}">
+                            </div>
+                        @endif
                         <div id="upload-file" class="item up-load">
                             <label class="uploadfile" for="myFile">
                                 <span class="icon">
@@ -137,6 +145,10 @@
                             </label>
                         </div>
                     </div>
+                    @error('image')
+                        <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                    @enderror
+                    <div class="text-tiny">Maximum file size: 2MB. Allowed formats: jpeg, png, jpg, gif, svg.</div>
                 </fieldset>
 
                 <fieldset>
@@ -159,32 +171,52 @@
                             </label>
                         </div>
                     </div>
+                    @error('gallery')
+                        <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                    @enderror
+                    @error('gallery.*')
+                        <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                    @enderror
+                    <div class="text-tiny">Maximum 5 images, 2MB each. Allowed formats: jpeg, png, jpg, gif, svg.</div>
                 </fieldset>
-
 
                 <div class="cols gap22">
                     <fieldset class="name">
                         <div class="body-title mb-10">Sale Price<span class="tf-color-1">*</span></div>
-                        <input class="mb-10" type="text" placeholder="Enter regular price"
-                            name="price" tabindex="0" value="{{ $product->price }}" aria-required="true" required>
+                        <input class="mb-10 @error('price') is-invalid @enderror" type="number" min="0.01" step="0.01" placeholder="Enter sale price"
+                            name="price" value="{{ old('price', $product->price) }}" required>
+                        @error('price')
+                            <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                        @enderror
                     </fieldset>
+
                     <fieldset class="name">
-                        <div class="body-title mb-10">Regular Price <sapan class="tf-color-1">*</sapan></div>
-                        <input class="mb-10" type="text" placeholder="Enter Cost"
-                            name="cost" tabindex="0" value="{{ $product->cost }}" aria-required="true" required>
+                        <div class="body-title mb-10">Regular Price <span class="tf-color-1">*</span></div>
+                        <input class="mb-10 @error('cost') is-invalid @enderror" type="number" min="0.01" step="0.01" placeholder="Enter cost"
+                            name="cost" value="{{ old('cost', $product->cost) }}" required>
+                        @error('cost')
+                            <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                        @enderror
                     </fieldset>
                 </div>
 
                 <div class="cols gap22">
                     <fieldset class="name">
                         <div class="body-title mb-10">SKU <span class="tf-color-1">*</span></div>
-                        <input class="mb-10" type="text" placeholder="Enter SKU" name="SKU"
-                            tabindex="0" value="{{ $product->SKU }}" aria-required="true" required>
+                        <input class="mb-10 @error('SKU') is-invalid @enderror" type="text" placeholder="Enter SKU" name="SKU"
+                            value="{{ old('SKU', $product->SKU) }}" required>
+                        @error('SKU')
+                            <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                        @enderror
                     </fieldset>
+
                     <fieldset class="name">
                         <div class="body-title mb-10">Quantity <span class="tf-color-1">*</span></div>
-                        <input class="mb-10" type="text" placeholder="Enter quantity"
-                            name="quantity" tabindex="0" value="{{ old('quantity', $product->quantity) }}" aria-required="true" required>
+                        <input class="mb-10 @error('quantity') is-invalid @enderror" type="number" min="0" placeholder="Enter quantity"
+                            name="quantity" value="{{ old('quantity', $product->quantity) }}" required>
+                        @error('quantity')
+                            <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                        @enderror
                     </fieldset>
                 </div>
 
@@ -192,20 +224,27 @@
                     <fieldset class="name">
                         <div class="body-title mb-10">Stock</div>
                         <div class="select mb-10">
-                            <select class="" name="stock_status">
-                                <option value="instock" {{ $product->stock_status == 'instock' ? 'selected' : '' }}>In Stock</option>
-                                <option value="outofstock" {{ $product->stock_status == 'outofstock' ? 'selected' : '' }}>Out of Stock</option>
+                            <select class="@error('stock_status') is-invalid @enderror" name="stock_status">
+                                <option value="instock" {{ old('stock_status', $product->stock_status) == 'instock' ? 'selected' : '' }}>In Stock</option>
+                                <option value="outofstock" {{ old('stock_status', $product->stock_status) == 'outofstock' ? 'selected' : '' }}>Out of Stock</option>
                             </select>
                         </div>
+                        @error('stock_status')
+                            <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                        @enderror
                     </fieldset>
+
                     <fieldset class="name">
                         <div class="body-title mb-10">Featured</div>
                         <div class="select mb-10">
-                            <select class="" name="featured">
-                                <option value="0" {{  $product->featured == 0 ? 'selected' : '' }}>No</option>
-                                <option value="1" {{ $product->featured == 1 ? 'selected' : '' }}>Yes</option>
+                            <select class="@error('featured') is-invalid @enderror" name="featured">
+                                <option value="0" {{ old('featured', $product->featured) == 0 ? 'selected' : '' }}>No</option>
+                                <option value="1" {{ old('featured', $product->featured) == 1 ? 'selected' : '' }}>Yes</option>
                             </select>
                         </div>
+                        @error('featured')
+                            <div class="text-danger text-tiny mt-2">{{ $message }}</div>
+                        @enderror
                     </fieldset>
                 </div>
 
@@ -214,18 +253,14 @@
                 </div>
             </div>
         </form>
-        <!-- /form-add-product -->
     </div>
-    <!-- /main-content-wrap -->
 </div>
-
 @endsection
+
 @push('scripts')
     <script>
         $(function() {
-
             $('#myFile').on('change', function(e) {
-                const photoInput = $('#myFile');
                 const [file] = this.files;
                 if (file) {
                     $("#imgpreview img").attr('src', URL.createObjectURL(file));
@@ -234,48 +269,11 @@
             });
 
             $('#gFile').on('change', function(e) {
-                const photoInput = $('#gFile');
                 const gphotos = this.files;
                 $.each(gphotos, function(key, value) {
                    $('#galUpload').prepend(`<div class="item"><img src="${URL.createObjectURL(value)}" /></div>`);
                 });
             });
-
-            $(document).ready(function() {
-            $('#categoryDropdown').change(function() {
-                const categoryId = $(this).val();
-
-                if (categoryId) {
-                    $.ajax({
-                        url: '/get-brands-by-category',
-                        type: 'GET',
-                        data: { category_id: categoryId },
-                        success: function(response) {
-                            const brandDropdown = $('#brandDropdown');
-                            brandDropdown.empty();
-                            brandDropdown.append('<option value="">Choose Brand</option>');
-
-                            if (response.length > 0) {
-                                $.each(response, function(index, brand) {
-                                    brandDropdown.append(`<option value="${brand.id}">${brand.brand_name}</option>`);
-                                });
-                            } else {
-                                brandDropdown.append('<option value="">No brands found for this category</option>');
-                            }
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error fetching brands:', xhr.responseText);
-                            $('#brandDropdown').empty();
-                            $('#brandDropdown').append('<option value="">Error fetching brands</option>');
-                        }
-                    });
-                } else {
-                    $('#brandDropdown').empty();
-                    $('#brandDropdown').append('<option value="">Choose Brand</option>');
-                }
-            });
-        });
-
         });
     </script>
 @endpush

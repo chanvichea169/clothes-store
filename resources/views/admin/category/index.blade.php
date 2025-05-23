@@ -31,7 +31,6 @@
                 </li>
             </ul>
         </div>
-
         <div class="wg-box">
             <div class="flex items-center justify-between gap10 flex-wrap">
                 <div class="wg-filter flex-grow">
@@ -50,23 +49,23 @@
             </div>
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
-                @if(Session::has('success'))
-                    <p class="alert alert-success">{{ Session::get('success') }}</p>
-                @endif
+                    @if(Session::has('success'))
+                        <p class="alert" style="font-size: 20px; color: white; background: rgb(2, 178, 75);">{{ Session::get('success') }}</p>
+                    @endif
+
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
                                 <th>#</th>
                                 <th>Name</th>
                                 <th>Slug</th>
-                                <th>Products</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($categories as $category)
+                            @foreach($categories as $key => $category)
                                 <tr>
-                                    <td>{{ $category->id }}</td>
+                                    <td>{{ $key + 1 }}</td>
                                     <td class="pname">
                                         <div class="image">
                                             <img src="{{ asset('uploads/categories/' . $category->image) }}" alt="{{ $category->name }}" class="image">
@@ -76,7 +75,6 @@
                                         </div>
                                     </td>
                                     <td>{{ $category->slug }}</td>
-                                    <td><a href="#" target="_blank">0</a></td>
                                     <td>
                                         <div class="list-icon-function">
 
@@ -108,6 +106,7 @@
         </div>
     </div>
 </div>
+@endsection
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
@@ -138,4 +137,3 @@
 </script>
 @endpush
 
-@endsection

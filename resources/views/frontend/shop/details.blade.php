@@ -1,11 +1,6 @@
 @extends('frontend.layouts.master')
 @section('title', '- ProductDetails')
 @section('content')
-<style>
-    .filled-heart {
-        color: orange;
-    }
-</style>
 <main class="pt-90">
     <div class="mb-md-1 pb-md-3"></div>
     <section class="product-single container">
@@ -21,7 +16,6 @@
                     @else
                         <p>Product not found.</p>
                     @endif
-
                       <a data-fancybox="gallery" href="{{ asset('uploads/products')}}/{{$product->image }}" data-bs-toggle="tooltip"
                         data-bs-placement="left" title="Zoom">
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,7 +69,7 @@
               <a href="{{ route('home.index') }}" class="menu-link menu-link_us-s text-uppercase fw-medium">Home</a>
               <span class="breadcrumb-separator menu-link fw-medium ps-1 pe-1">/</span>
               <a href="{{ route('shop.index') }}" class="menu-link menu-link_us-s text-uppercase fw-medium">The Shop</a>
-            </div><!-- /.breadcrumb -->
+            </div>
 
             <div
               class="product-single__prev-next d-flex align-items-center justify-content-between justify-content-md-end flex-grow-1">
@@ -90,6 +84,11 @@
             </div>
           </div>
           <h1 class="product-single__name">{{ $product->name }}</h1>
+
+          @if($product->quantity <= 0)
+              <div class="out-of-stock-badge mb-3">Out of Stock</div>
+          @endif
+
           <div class="product-single__rating">
             <div class="reviews-group d-flex">
               <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
@@ -123,29 +122,54 @@
             <h4>Short Description</h4>
             <p>{{ $product->description }}</p>
           </div>
-          <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
-            @csrf
-            <div class="product-single__addtocart">
-              <div class="qty-control position-relative">
-                <input type="number" name="quantity" value="1" min="1" class="qty-control__number text-center">
-                <div class="qty-control__reduce">-</div>
-                <div class="qty-control__increase">+</div>
-              </div><!-- .qty-control -->
-                <input type="hidden" name="id" value="{{ $product->id }}">
-                <input type="hidden" name="name" value="{{ $product->name }}">
-                <input type="hidden" name="price" value="{{ $product->price == '' ? $product->cost : $product->price }}">
-              <button type="submit" class="btn btn-primary btn-addtocart" data-aside="cartDrawer">
-                Add to Cart
-              </button>
-            </div>
-          </form>
-          <div class="product-single__addtolinks">
 
+          @if($product->quantity > 0)
+              @if( Cart::instance('cart')->content()->where('id',$product->id)->count() > 0)
+                  <a href="{{ route('cart.index') }}"
+                      class="btn btn-secondary btn-addtocart btn-addtocart--filled" data-aside="cartDrawer">
+                      Go to Cart<i class="arrow-right"></i>
+                  </a>
+              @else
+                  <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
+                      @csrf
+                      <div class="product-single__addtocart">
+                          <div class="qty-control position-relative">
+                              <input type="number" name="quantity" value="1" min="1" max="{{ $product->quantity }}" class="qty-control__number text-center">
+                              <div class="qty-control__reduce">-</div>
+                              <div class="qty-control__increase">+</div>
+                          </div>
+                          <input type="hidden" name="id" value="{{ $product->id }}">
+                          <input type="hidden" name="name" value="{{ $product->name }}">
+                          <input type="hidden" name="price" value="{{ $product->price == '' ? $product->cost : $product->price }}">
+                          <button type="submit" class="btn btn-primary btn-addtocart" data-aside="cartDrawer">
+                              Add to Cart
+                          </button>
+                      </div>
+                  </form>
+              @endif
+          @else
+              <div class="out-of-stock-section">
+                  <button class="btn btn-outline-secondary" disabled>Out of Stock</button>
+                  @if($product->expected_restock_date)
+                      <div class="restock-notice mt-2">
+                          Expected back in stock: {{ $product->expected_restock_date->format('M d, Y') }}
+                      </div>
+                  @endif
+                  <form class="notify-me-form mt-3">
+                      <div class="input-group">
+                          <input type="email" class="form-control" placeholder="Notify me when available">
+                          <button class="btn btn-outline-primary" type="submit">Notify</button>
+                      </div>
+                  </form>
+              </div>
+          @endif
+
+          <div class="product-single__addtolinks">
             @if(Cart::instance('wishlist')->content()->where('id',$product->id)->count() > 0)
             <form action="{{ route('wishlist.remove_from_wishlist', ['rowId' => Cart::instance('wishlist')->content()->where('id', $product->id)->first()->rowId]) }}" method="POST" id="frm-wishlist-remove">
                 @csrf
                 @method('DELETE')
-                <a href="cc" class="menu-link menu-link_us-s add-to-wishlist filled-heart" onclick="document.getElementById('frm-wishlist-remove').submit();"><svg width="16" height="16" viewBox="0 0 20 20"
+                <a href="#" class="menu-link menu-link_us-s add-to-wishlist filled-heart" onclick="document.getElementById('frm-wishlist-remove').submit();"><svg width="16" height="16" viewBox="0 0 20 20"
                     fill="none" xmlns="http://www.w3.org/2000/svg">
                     <use href="#icon_heart" />
                 </svg><span>Remove from Wishlist</span>
@@ -194,8 +218,6 @@
                 </div>
               </details>
             </share-button>
-            <script src="js/details-disclosure.html" defer="defer"></script>
-            <script src="js/share.html" defer="defer"></script>
           </div>
           <div class="product-single__meta-info">
             <div class="meta-item">
@@ -208,7 +230,7 @@
             </div>
             <div class="meta-item">
               <label>Tags:</label>
-              <span>{{ $product->status ?? NA }}</span>
+              <span>{{ $product->status ?? 'N/A' }}</span>
             </div>
           </div>
         </div>
@@ -261,138 +283,83 @@
             </div>
           </div>
           <div class="tab-pane fade" id="tab-reviews" role="tabpanel" aria-labelledby="tab-reviews-tab">
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
+                </div>
+            @endif
             <h2 class="product-single__reviews-title">Reviews</h2>
             <div class="product-single__reviews-list">
-              <div class="product-single__reviews-item">
-                <div class="customer-avatar">
-                  <img loading="lazy" src="assets/images/avatar.jpg" alt="" />
-                </div>
-                <div class="customer-review">
-                  <div class="customer-name">
-                    <h6>Janice Miller</h6>
-                    <div class="reviews-group d-flex">
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
+                <div class="product-single__reviews-item">
+                    <div class="customer-avatar">
+                        <img loading="lazy" src="{{ asset('assets/images/user-icon.png') }}" alt="Janice Miller" />
                     </div>
-                  </div>
-                  <div class="review-date">April 06, 2023</div>
-                  <div class="review-text">
-                    <p>Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod
-                      maxime placeat facere possimus, omnis voluptas assumenda est…</p>
-                  </div>
-                </div>
-              </div>
-              <div class="product-single__reviews-item">
-                <div class="customer-avatar">
-                  <img loading="lazy" src="assets/images/avatar.jpg" alt="" />
-                </div>
-                <div class="customer-review">
-                  <div class="customer-name">
-                    <h6>Benjam Porter</h6>
-                    <div class="reviews-group d-flex">
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
-                      <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
-                        <use href="#icon_star" />
-                      </svg>
+                    <div class="customer-review">
+                        <div class="customer-name">
+                            <h6>Chann Vichea</h6>
+                            <div class="reviews-group d-flex">
+                                @for($i = 0; $i < 5; $i++)
+                                <svg class="review-star" viewBox="0 0 9 9" xmlns="http://www.w3.org/2000/svg">
+                                    <use href="#icon_star" />
+                                </svg>
+                                @endfor
+                            </div>
+                        </div>
+                        <div class="review-date">April 06, 2025</div>
+                        <div class="review-text">
+                            <p>Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod maxime placeat facere possimus, omnis voluptas assumenda est…</p>
+                        </div>
                     </div>
-                  </div>
-                  <div class="review-date">April 06, 2023</div>
-                  <div class="review-text">
-                    <p>Nam libero tempore, cum soluta nobis est eligendi optio cumque nihil impedit quo minus id quod
-                      maxime placeat facere possimus, omnis voluptas assumenda est…</p>
-                  </div>
                 </div>
-              </div>
             </div>
             <div class="product-single__review-form">
-              <form name="customer-review-form">
-                <h5>Be the first to review “Message Cotton T-Shirt”</h5>
-                <p>Your email address will not be published. Required fields are marked *</p>
-                <div class="select-star-rating">
-                  <label>Your rating *</label>
-                  <span class="star-rating">
-                    <svg class="star-rating__star-icon" width="12" height="12" fill="#ccc" viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                    <svg class="star-rating__star-icon" width="12" height="12" fill="#ccc" viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                    <svg class="star-rating__star-icon" width="12" height="12" fill="#ccc" viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                    <svg class="star-rating__star-icon" width="12" height="12" fill="#ccc" viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                    <svg class="star-rating__star-icon" width="12" height="12" fill="#ccc" viewBox="0 0 12 12"
-                      xmlns="http://www.w3.org/2000/svg">
-                      <path
-                        d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
-                    </svg>
-                  </span>
-                  <input type="hidden" id="form-input-rating" value="" />
-                </div>
-                <div class="mb-4">
-                  <textarea id="form-input-review" class="form-control form-control_gray" placeholder="Your Review"
-                    cols="30" rows="8"></textarea>
-                </div>
-                <div class="form-label-fixed mb-4">
-                  <label for="form-input-name" class="form-label">Name *</label>
-                  <input id="form-input-name" class="form-control form-control-md form-control_gray">
-                </div>
-                <div class="form-label-fixed mb-4">
-                  <label for="form-input-email" class="form-label">Email address *</label>
-                  <input id="form-input-email" class="form-control form-control-md form-control_gray">
-                </div>
-                <div class="form-check mb-4">
-                  <input class="form-check-input form-check-input_fill" type="checkbox" value="" id="remember_checkbox">
-                  <label class="form-check-label" for="remember_checkbox">
-                    Save my name, email, and website in this browser for the next time I comment.
-                  </label>
-                </div>
-                <div class="form-action">
-                  <button type="submit" class="btn btn-primary">Submit</button>
-                </div>
-              </form>
+                <form name="customer-review-form" method="POST" action="{{ route('reviews.store') }}">
+                    @csrf
+                    <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    <h5>Be the first to review "{{ $product->name }}"</h5>
+                    <p>Your email address will not be published. Required fields are marked *</p>
+                    <div class="select-star-rating">
+                        <label>Your rating *</label>
+                        <span class="star-rating">
+                            @for($i = 1; $i <= 5; $i++)
+                            <svg class="star-rating__star-icon" width="12" height="12" fill="#ccc" viewBox="0 0 12 12"
+                                 xmlns="http://www.w3.org/2000/svg" data-rating="{{ $i }}">
+                                <path d="M11.1429 5.04687C11.1429 4.84598 10.9286 4.76562 10.7679 4.73884L7.40625 4.25L5.89955 1.20312C5.83929 1.07589 5.72545 0.928571 5.57143 0.928571C5.41741 0.928571 5.30357 1.07589 5.2433 1.20312L3.73661 4.25L0.375 4.73884C0.207589 4.76562 0 4.84598 0 5.04687C0 5.16741 0.0870536 5.28125 0.167411 5.3683L2.60491 7.73884L2.02902 11.0871C2.02232 11.1339 2.01563 11.1741 2.01563 11.221C2.01563 11.3951 2.10268 11.5558 2.29688 11.5558C2.39063 11.5558 2.47768 11.5223 2.56473 11.4754L5.57143 9.89509L8.57813 11.4754C8.65848 11.5223 8.75223 11.5558 8.84598 11.5558C9.04018 11.5558 9.12054 11.3951 9.12054 11.221C9.12054 11.1741 9.12054 11.1339 9.11384 11.0871L8.53795 7.73884L10.9688 5.3683C11.0558 5.28125 11.1429 5.16741 11.1429 5.04687Z" />
+                            </svg>
+                            @endfor
+                        </span>
+                        <input type="hidden" id="form-input-rating" name="rating" value="" required>
+                    </div>
+                    <div class="mb-4">
+                        <textarea id="form-input-review" name="review" class="form-control form-control_gray"
+                                  placeholder="Your Review" cols="30" rows="8" required></textarea>
+                    </div>
+                    <div class="form-label-fixed mb-4">
+                        <label for="form-input-name" class="form-label">Name *</label>
+                        <input id="form-input-name" name="name" class="form-control form-control-md form-control_gray" required>
+                    </div>
+                    <div class="form-label-fixed mb-4">
+                        <label for="form-input-email" class="form-label">Email address *</label>
+                        <input type="email" id="form-input-email" name="email" class="form-control form-control-md form-control_gray" required>
+                    </div>
+                    <div class="form-check mb-4">
+                        <input class="form-check-input form-check-input_fill" type="checkbox" id="remember_checkbox" name="remember">
+                        <label class="form-check-label" for="remember_checkbox">
+                            Save my name, email, and website in this browser for the next time I comment.
+                        </label>
+                    </div>
+                    <div class="form-action">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </div>
+                </form>
             </div>
           </div>
         </div>
       </div>
     </section>
+    <!-- Related Products -->
     <section class="products-carousel container">
       <h2 class="h3 text-uppercase mb-4 pb-xl-2 mb-xl-4">Related <strong>Products</strong></h2>
-
       <div id="related_products" class="position-relative">
         <div class="swiper-container js-swiper-slider" data-settings='{
             "autoplay": false,
@@ -428,7 +395,7 @@
             }
           }'>
           <div class="swiper-wrapper">
-            @foreach ($rproducts as $rproduct)
+            @foreach ($rproducts->where('quantity', '>', 0) as $rproduct)
               <div class="swiper-slide product-card">
                 <div class="pc__img-wrapper">
                   <a href="{{ route('shop.details', ['product_slug' => $rproduct->slug]) }}">
@@ -438,9 +405,8 @@
                       width="330"
                       height="400"
                       alt="{{ $rproduct->name }}"
-                      class="pc__img">
-
-                    <!-- Display gallery images -->
+                      class="pc__img"
+                    >
                     @foreach (explode(",", $rproduct->gallery) as $img)
                       <img
                         loading="lazy"
@@ -448,39 +414,50 @@
                         width="330"
                         height="400"
                         alt="{{ $rproduct->name }}"
-                        class="pc__img pc__img-second">
+                        class="pc__img pc__img-second"
+                      >
                     @endforeach
                   </a>
 
-                  <!-- Cart Button Logic -->
-                  @if(Cart::instance('cart')->content()->where('id', $rproduct->id)->count() > 0)
-                    <a
-                      href="{{ route('cart.index') }}"
-                      class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium btn-warning mb-3">
-                      Go to Cart
-                    </a>
+                  @if ($rproduct->quantity > 0)
+                    @if (Cart::instance('cart')->content()->where('id', $rproduct->id)->count() > 0)
+                      <a
+                        href="{{ route('cart.index') }}"
+                        class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium btn-warning mb-3"
+                      >
+                        Go to Cart
+                      </a>
+                    @else
+                      <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
+                        @csrf
+                        <button
+                          class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart"
+                          data-aside="cartDrawer"
+                          title="Add To Cart"
+                        >
+                          Add To Cart
+                        </button>
+                        <input type="hidden" name="id" value="{{ $rproduct->id }}">
+                        <input type="hidden" name="name" value="{{ $rproduct->name }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="price" value="{{ $rproduct->price ?: $rproduct->cost }}">
+                      </form>
+                    @endif
                   @else
-                    <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
-                      @csrf
-                      <button
-                        class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart"
-                        data-aside="cartDrawer"
-                        title="Add To Cart">
-                        Add To Cart
-                      </button>
-                      <input type="hidden" name="id" value="{{ $rproduct->id }}">
-                      <input type="hidden" name="name" value="{{ $rproduct->name }}">
-                      <input type="hidden" name="quantity" value="1">
-                      <input type="hidden" name="price" value="{{ $rproduct->price ?: $rproduct->cost }}">
-                    </form>
+                    <button class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium disabled"
+                        title="Out of Stock" disabled>
+                      Out of Stock
+                    </button>
                   @endif
                 </div>
-                <p class="pc__category">{{ $rproduct->category->name }}</p>
+
+                {{-- <p class="pc__category">{{ $rproduct->category->name }}</p> --}}
+                <p class="pc__category">{{ $rproduct->description }}</p>
                 <h6 class="pc__title"><a href="#">{{ $rproduct->name }}</a></h6>
-                <!-- Product Price -->
+
                 <div class="product-card__price d-flex">
                   <span class="money price">
-                    @if($rproduct->price)
+                    @if ($rproduct->price)
                       <s>${{ $rproduct->cost }}</s> <span style="color:red">${{ $rproduct->price }}</span>
                     @else
                       ${{ $rproduct->cost }}
@@ -488,35 +465,96 @@
                   </span>
                 </div>
 
-                <!-- Wishlist Button -->
-                <button
-                  class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
-                  title="Add To Wishlist">
-                  <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <use href="#icon_heart" />
-                  </svg>
-                </button>
+                @if (Cart::instance('wishlist')->content()->where('id', $rproduct->id)->count() > 0)
+                  <form action="{{ route('wishlist.remove_from_wishlist', ['rowId' => Cart::instance('wishlist')->content()->where('id', $rproduct->id)->first()->rowId]) }}" method="POST">
+                    @csrf
+                    @method('DELETE')
+                    <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist filled-heart" title="Remove From Wishlist">
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <use href="#icon_heart" />
+                      </svg>
+                    </button>
+                  </form>
+                @else
+                  <form action="{{ route('wishlist.add_to_wishlist') }}" method="POST" id="wishlist-form">
+                    @csrf
+                    <input type="hidden" name="id" value="{{ $rproduct->id }}">
+                    <input type="hidden" name="name" value="{{ $rproduct->name }}">
+                    <input type="hidden" name="price" value="{{ $rproduct->price == '' ? $rproduct->cost : $rproduct->price }}">
+                    <input type="hidden" name="quantity" value="{{ $rproduct->quantity }}">
+                    <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist" title="Add To Wishlist">
+                      <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <use href="#icon_heart" />
+                      </svg>
+                    </button>
+                  </form>
+                @endif
               </div>
             @endforeach
           </div>
 
-        </div><!-- /.swiper-container js-swiper-slider -->
-
+        </div>
         <div class="products-carousel__prev position-absolute top-50 d-flex align-items-center justify-content-center">
           <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
             <use href="#icon_prev_md" />
           </svg>
-        </div><!-- /.products-carousel__prev -->
+        </div>
         <div class="products-carousel__next position-absolute top-50 d-flex align-items-center justify-content-center">
           <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
             <use href="#icon_next_md" />
           </svg>
-        </div><!-- /.products-carousel__next -->
-
+        </div>
         <div class="products-pagination mt-4 mb-5 d-flex align-items-center justify-content-center"></div>
-        <!-- /.products-pagination -->
-      </div><!-- /.position-relative -->
-
-    </section><!-- /.products-carousel container -->
+      </div>
+    </section>
 </main>
+
+<style>
+.stock-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2;
+}
+
+.stock-badge.out-of-stock {
+    background-color: #ffecec;
+    color: #d14343;
+    border: 1px solid #ffb3b3;
+}
+
+.stock-badge.low-stock {
+    background-color: #fff8e6;
+    color: #e6a700;
+    border: 1px solid #ffd966;
+}
+
+.out-of-stock-section {
+    padding: 15px;
+    border: 1px solid #eee;
+    border-radius: 5px;
+}
+
+.restock-notice {
+    font-size: 14px;
+    color: #666;
+    margin-top: 8px;
+}
+
+.notify-me-form {
+    margin-top: 15px;
+}
+
+.pc__atc.disabled {
+    background-color: #ccc !important;
+    cursor: not-allowed;
+}
+.filled-heart{
+        color: orange;
+    }
+</style>
 @endsection

@@ -11,5 +11,10 @@
 <script src="{{ asset('js/bootstrap-select.min.js') }}"></script>
 <script src="{{ asset('js/sweetalert.min.js') }}"></script>
 <script src="{{ asset('js/main.js') }}"></script>
+<!-- Corrected Preline CDN -->
+<script src="https://cdn.jsdelivr.net/npm/preline@latest/dist/preline.min.js"></script>
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @stack('scripts')
 

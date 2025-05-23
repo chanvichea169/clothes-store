@@ -18,6 +18,7 @@ Route::middleware(['web'])->group(function () {
     require __DIR__.'/frontend/about.php';
     require __DIR__.'/frontend/contact.php';
     require __DIR__.'/frontend/checkout.php';
+    require __DIR__.'/frontend/review.php';
 });
 
 //block backend
@@ -31,6 +32,8 @@ require __DIR__.'/admin/slide.php';
 require __DIR__.'/admin/contact.php';
 require __DIR__.'/admin/user.php';
 require __DIR__.'/admin/setting.php';
+require __DIR__.'/admin/about.php';
+require __DIR__.'/admin/category_banner.php';
 
 //block auth
 require __DIR__.'/auth.php';

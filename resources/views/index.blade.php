@@ -107,21 +107,21 @@
               @foreach ($categories as $category)
               <div class="swiper-slide">
                 <img loading="lazy" class="w-100 h-auto mb-3" src="{{ asset('uploads/categories')}}/{{ $category->image }}" width="124"
-                  height="124" alt="" />
+                  height="124" alt="categories" />
                 <div class="text-center">
                   <a href="{{ route('shop.index',['categories'=>$category->id]) }}" class="menu-link fw-medium">{{ $category->name }}<br />Tops</a>
                 </div>
               </div>
               @endforeach
-            </div><!-- /.swiper-wrapper -->
-          </div><!-- /.swiper-container js-swiper-slider -->
+            </div>
+          </div>
 
           <div
             class="products-carousel__prev products-carousel__prev-1 position-absolute top-50 d-flex align-items-center justify-content-center">
             <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
               <use href="#icon_prev_md" />
             </svg>
-          </div><!-- /.products-carousel__prev -->
+          </div>
           <div
             class="products-carousel__next products-carousel__next-1 position-absolute top-50 d-flex align-items-center justify-content-center">
             <svg width="25" height="25" viewBox="0 0 25 25" xmlns="http://www.w3.org/2000/svg">
@@ -227,7 +227,11 @@
 
                                     <div class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
                                         @if(Cart::instance('cart')->content()->where('id',$onSaleProduct->id)->count() > 0)
-                                            <a href="{{ route('cart.index') }}" class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart btn-warning mb-3"><span style="font-size: 12px;">Go to Cart</span></a>
+                                            <a href="{{ route('cart.index') }}"
+                                            class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart btn-warning text-center"
+                                            >
+                                                Go to Cart
+                                            </a>
                                         @else
                                         <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
                                         @csrf
@@ -298,165 +302,192 @@
 
       <section class="category-banner container">
         <div class="row">
-          <div class="col-md-6">
-            <div class="category-banner__item border-radius-10 mb-5">
-              <img loading="lazy" class="h-auto" src="{{ asset('assets/images/home/demo3/category_9.jpg')}}" width="690" height="665"
-                alt="" />
-              <div class="category-banner__item-mark">
-                Starting at $19
-              </div>
-              <div class="category-banner__item-content">
-                <h3 class="mb-0">Blazers</h3>
-                <a href="#" class="btn-link default-underline text-uppercase fw-medium">Shop Now</a>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="category-banner__item border-radius-10 mb-5">
-              <img loading="lazy" class="h-auto" src="{{ asset('assets/images/home/demo3/category_10.jpg')}}" width="690" height="665"
-                alt="" />
-              <div class="category-banner__item-mark">
-                Starting at $19
-              </div>
-              <div class="category-banner__item-content">
-                <h3 class="mb-0">Sportswear</h3>
-                <a href="#" class="btn-link default-underline text-uppercase fw-medium">Shop Now</a>
+          @foreach ($categoryBanners as $banner)
+            <div class="col-md-6">
+              <div class="category-banner__item border-radius-10 mb-5">
+                <img loading="lazy" class="h-auto"
+                     src="{{ asset('uploads/category_banners/' . $banner->image) }}"
+                     width="690" height="665" alt="{{ $banner->title }}" />
+                <div class="category-banner__item-mark">
+                  Starting at ${{ $banner->starting_price }}
+                </div>
+                <div class="category-banner__item-content">
+                  <h3 class="mb-0">{{ $banner->title }}</h3>
+                  <a href="{{ $banner->link ?? '#' }}" class="btn-link default-underline text-uppercase fw-medium">Shop Now</a>
+                </div>
               </div>
             </div>
-          </div>
+          @endforeach
         </div>
       </section>
+
 
       <div class="mb-3 mb-xl-5 pt-1 pb-4"></div>
 
       <section class="products-grid container">
         <h2 class="section-title text-center mb-3 pb-xl-3 mb-xl-4">Featured Products</h2>
-        <div class="row">
-        @foreach ($fProducts as $fproduct)
-          <div class="col-6 col-md-4 col-lg-3">
-            <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
-              <div class="pc__img-wrapper">
-                <a href="{{ route('shop.details',['product_slug'=>$fproduct->slug]) }}">
-                  <img loading="lazy" src="{{ asset('uploads/products')}}/{{ $fproduct->image }}" width="330" height="400"
-                    alt="{{ $fproduct->name }}" class="pc__img">
-                </a>
-              </div>
-
-              <div class="pc__info position-relative">
-                <h6 class="pc__title"><a href="{{ route('shop.details',['product_slug'=>$fproduct->slug]) }}">{{ $fproduct->name }}</a></h6>
-                <div class="product-card__price d-flex align-items-center">
-                  <span class="money price text-secondary">
-                    @if($fproduct->price)
-                    <s>${{ $fproduct->cost }}</s><span style="color:red;">${{ $fproduct->price }}</span>
-                    @else
-                    ${{ $fproduct->price }}
-                    @endif
-                  </span>
+        <div class="row" id="product-list">
+          @foreach ($fProducts as $fproduct)
+            <div class="col-6 col-md-4 col-lg-3">
+              <div class="product-card product-card_style3 mb-3 mb-md-4 mb-xxl-5">
+                <div class="pc__img-wrapper">
+                  <a href="{{ route('shop.details', ['product_slug' => $fproduct->slug]) }}">
+                    <img loading="lazy" src="{{ asset('uploads/products/' . $fproduct->image) }}" width="330" height="400"
+                      alt="{{ $fproduct->name }}" class="pc__img">
+                  </a>
                 </div>
 
-                <div class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
-                    @if(Cart::instance('cart')->content()->where('id',$fproduct->id)->count() > 0)
-                    <a href="{{ route('cart.index') }}" class="pc__atc btn anim_appear-bottom btn position-absolute border-0 text-uppercase fw-medium js-add-cart btn-warning mb-3"><span style="font-size: 12px;">Go to Cart</span></a>
+                <div class="pc__info position-relative">
+                  <h6 class="pc__title">
+                    <a href="{{ route('shop.details', ['product_slug' => $fproduct->slug]) }}">
+                      {{ $fproduct->name }}
+                    </a>
+                  </h6>
+                  <div class="product-card__price d-flex align-items-center">
+                    <span class="money price text-secondary">
+                      @if($fproduct->price)
+                        <s>${{ $fproduct->cost }}</s>
+                        <span style="color:red;">${{ $fproduct->price }}</span>
+                      @else
+                        ${{ $fproduct->cost }}
+                      @endif
+                    </span>
+                  </div>
+
+                  <div class="anim_appear-bottom position-absolute bottom-0 start-0 d-none d-sm-flex align-items-center bg-body">
+                    @if(Cart::instance('cart')->content()->where('id', $fproduct->id)->count() > 0)
+                      <a href="{{ route('cart.index') }}"
+                        class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart btn-warning text-center">
+                        Go to Cart
+                      </a>
                     @else
-                    <form name="addtocart-form" method="post" action="{{ route('cart.add') }}">
-                    @csrf
-                    <button
-                    class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart"
-                    data-aside="cartDrawer" title="Add To Cart">
-                    Add To Cart
-                    </button>
-                    <input type="hidden" name="id" value="{{ $fproduct->id }}">
-                    <input type="hidden" name="name" value="{{ $fproduct->name }}">
-                    <input type="hidden" name="quantity" value="1">
-                    <input type="hidden" name="price" value="{{ $fproduct->price == '' ? $fproduct->cost : $fproduct->price }}">
-                    </form>
+                      <form method="POST" action="{{ route('cart.add') }}">
+                        @csrf
+                        <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-add-cart"
+                          data-aside="cartDrawer" title="Add To Cart">
+                          Add To Cart
+                        </button>
+                        <input type="hidden" name="id" value="{{ $fproduct->id }}">
+                        <input type="hidden" name="name" value="{{ $fproduct->name }}">
+                        <input type="hidden" name="quantity" value="1">
+                        <input type="hidden" name="price" value="{{ $fproduct->price ?: $fproduct->cost }}">
+                      </form>
                     @endif
 
-                    <form action="{{  route('shop.details',['product_slug'=>$fproduct->slug]) }}" method="GET">
-                    @csrf
-                    <input type="hidden" name="id" value="{{ $fproduct->id }}">
-                    <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-quick-view"
+                    <form action="{{ route('shop.details', ['product_slug' => $fproduct->slug]) }}" method="GET">
+                      @csrf
+                      <input type="hidden" name="id" value="{{ $fproduct->id }}">
+                      <button class="btn-link btn-link_lg me-4 text-uppercase fw-medium js-quick-view"
                         data-bs-toggle="modal" data-bs-target="#quickView" title="Quick view">
                         <span class="d-none d-xxl-block">Quick View</span>
                         <span class="d-block d-xxl-none">
-                            <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
-                                xmlns="http://www.w3.org/2000/svg">
-                                <use href="#icon_view" />
-                            </svg>
+                          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <use href="#icon_view" />
+                          </svg>
                         </span>
-                    </button>
+                      </button>
                     </form>
 
-                  @if(Cart::instance('wishlist')->content()->where('id',$fproduct->id)->count() > 0)
-                  <form action="{{ route('wishlist.remove_from_wishlist', ['rowId' => Cart::instance('wishlist')->content()->where('id', $fproduct->id)->first()->rowId]) }}" method="POST">
-                      @csrf
-                      @method('DELETE')
-                      <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist filled-heart" title="Remove From Wishlist">
-                          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <use href="#icon_heart" />
+                    @php
+                      $wishlistItem = Cart::instance('wishlist')->content()->where('id', $fproduct->id)->first();
+                    @endphp
+
+                    @if($wishlistItem)
+                      <form action="{{ route('wishlist.remove_from_wishlist', ['rowId' => optional($wishlistItem)->rowId]) }}" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist filled-heart"
+                          title="Remove From Wishlist">
+                          <svg width="16" height="16" viewBox="0 0 20 20" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <use href="#icon_heart" />
                           </svg>
-                      </button>
-                  </form>
-                  @else
-                      <form action="{{route('wishlist.add_to_wishlist')}}" method="POST" id="wishlist-form">
-                          @csrf
-                          <input type="hidden" name="id" value="{{ $fproduct->id }}">
-                          <input type="hidden" name="name" value="{{ $fproduct->name }}">
-                          <input type="hidden" name="price" value="{{ $fproduct->price == '' ? $fproduct->cost : $fproduct->price }}">
-                          <input type="hidden" name="quantity" value="{{ $fproduct->quantity }}">
-                          <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
-                          title="Add To Wishlist">
-                          <svg width="16" height="16" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <use href="#icon_heart" />
-                          </svg>
-                          </button>
+                        </button>
                       </form>
-                  @endif
+                    @else
+                      <form action="{{ route('wishlist.add_to_wishlist') }}" method="POST">
+                        @csrf
+                        <input type="hidden" name="id" value="{{ $fproduct->id }}">
+                        <input type="hidden" name="name" value="{{ $fproduct->name }}">
+                        <input type="hidden" name="price" value="{{ $fproduct->price ?: $fproduct->cost }}">
+                        <input type="hidden" name="quantity" value="{{ $fproduct->quantity }}">
+                        <button class="pc__btn-wl position-absolute top-0 end-0 bg-transparent border-0 js-add-wishlist"
+                          title="Add To Wishlist">
+                          <svg width="16" height="16" viewBox="0 0 20 20" fill="none"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <use href="#icon_heart" />
+                          </svg>
+                        </button>
+                      </form>
+                    @endif
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
           @endforeach
         </div><!-- /.row -->
+
         <input type="hidden" id="page" value="1">
         <div class="text-center mt-2">
-            <button id="load-more-btn" class="btn-link btn-link_lg default-underline text-uppercase fw-medium">
-              Load More
-            </button>
+          <button id="load-more-btn" class="btn-link btn-link_lg default-underline text-uppercase fw-medium">
+            Load More
+          </button>
         </div>
       </section>
+
     </div>
     <div class="mb-3 mb-xl-5 pt-1 pb-4">
     </div>
 </main>
 @endsection
+
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-  $('#load-more-btn').on('click', function () {
-    var page = parseInt($('#page').val()) + 1;
-    $.ajax({
-      url: "?page=" + page,
-      type: 'get',
-      beforeSend: function () {
-        $('#load-more-btn').text('Loading...');
-      }
-    })
-    .done(function (data) {
-      let html = $(data).find("#product-list").html();
-      if (html.trim().length == 0) {
-        $('#load-more-btn').text('No more products');
-        $('#load-more-btn').prop('disabled', true);
-        return;
-      }
-      $('#product-list').append(html);
-      $('#page').val(page);
-      $('#load-more-btn').text('Load More');
-    })
-    .fail(function () {
-      alert('Something went wrong. Please try again later.');
-      $('#load-more-btn').text('Load More');
-    });
+
+  document.addEventListener('DOMContentLoaded', function() {
+
+    if (typeof jQuery == 'undefined') {
+
+      var script = document.createElement('script');
+      script.src = 'https://code.jquery.com/jquery-3.6.0.min.js';
+      script.onload = initLoadMore;
+      document.head.appendChild(script);
+    } else {
+      initLoadMore();
+    }
+
+    function initLoadMore() {
+      $('#load-more-btn').on('click', function () {
+        var page = parseInt($('#page').val()) + 1;
+        var $btn = $(this);
+
+        $btn.prop('disabled', true).text('Loading...');
+
+        $.ajax({
+          url: "?page=" + page,
+          type: 'get',
+          dataType: 'html'
+        })
+
+          var $temp = $('<div>').html(data);
+          var html = $temp.find("#product-list").html();
+
+          if (html && html.trim().length > 0) {
+            $('#product-list').append(html);
+            $('#page').val(page);
+            $btn.prop('disabled', false).text('Load More');
+          } else {
+            $btn.text('No more products').prop('disabled', true);
+          }
+        })
+        .fail(function (jqXHR, textStatus, errorThrown) {
+          console.error("AJAX Error:", textStatus, errorThrown);
+          $btn.prop('disabled', false).text('Load More');
+          alert('Something went wrong. Please try again later.');
+        });
+      });
+    }
   });
 </script>
 @endpush

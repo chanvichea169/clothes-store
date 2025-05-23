@@ -26,8 +26,8 @@ class AppServiceProvider extends ServiceProvider
     {
 
         app()->setLocale(session('locale', config('app.locale')));
-        View::composer('*', function ($view) {
-            $view->with('categories', Category::orderBy('name', 'asc')->get());
-        });
+        // View::composer('*', function ($view) {
+        //     $view->with('categories', Category::orderBy('name', 'asc')->get());
+        // });
     }
 }

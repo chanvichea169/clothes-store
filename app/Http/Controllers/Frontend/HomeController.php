@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
 use App\Models\Category;
+use App\Models\CategoryBanner;
 use App\Models\Product;
 use App\Models\Slide;
 use Illuminate\Http\Request;
@@ -15,10 +16,22 @@ class HomeController extends Controller
     {
         $slides = Slide::where('status', 1)->get()->take(3);
         $categories = Category::orderBy('name')->get();
-        $onSaleProducts = Product::whereNotNull('cost')->where('cost', '<>', '')->inRandomOrder()->take(8)->get();
-        $fProducts = Product::where('featured', 1)->paginate(8);
-        return view('index', compact('slides', 'categories', 'onSaleProducts', 'fProducts'));
+        $onSaleProducts = Product::whereNotNull('cost')
+                                ->where('cost', '<>', '')
+                                ->where('quantity', '>', 0)
+                                ->inRandomOrder()
+                                ->take(8)
+                                ->get();
+
+        $fProducts = Product::where('featured', 1)
+                            ->where('quantity', '>', 0)
+                            ->paginate(8);
+
+        $categoryBanners = CategoryBanner::all();
+
+        return view('index', compact('slides', 'categories', 'onSaleProducts', 'fProducts', 'categoryBanners'));
     }
+
 
     public function search(Request $request)
     {

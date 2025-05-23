@@ -15,11 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
         //
     })
     ->withExceptions(function (Exceptions $exceptions) {
-        // Render 500 for server errors
         $exceptions->renderable(function (Throwable $e) {
             if ($e instanceof NotFoundHttpException) {
-                return response()->view('errors.404', [], 404); // Show 404 for missing routes
+                return response()->view('errors.404', [], 404);
             }
-            return response()->view('errors.500', [], 500); // Show 500 for other errors
+            return response()->view('errors.500', [], 500);
         });
-    })->create();
+})->create();

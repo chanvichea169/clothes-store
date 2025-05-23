@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Address;
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\StockMovement;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 use Surfsidemedia\Shoppingcart\Facades\Cart;
 use Stripe\Stripe;
@@ -75,63 +77,62 @@ class CheckoutController extends Controller
                     'checkout' => $checkout,
                     'cart_content' => Cart::instance('cart')->content()->toArray(),
                 ]);
+
                 $order = $this->createOrder($address, 'payment_pending');
                 $this->createOrderItems($order);
                 $this->createTransaction($order, 'paypal');
-                $this->clearCheckoutSession($order);
-                Session::put('order_completed', true);
-                Session::put('completed_order_id', $order->id);
-                Session::forget('pending_order');
-                Session::forget('checkout');
+                $this->updateStockQuantities($order);
+
 
                 return redirect()->route('paypal.create-order');
 
             case 'card':
-                    try {
-                        Stripe::setApiKey(config('services.stripe.secret'));
+                try {
+                    Stripe::setApiKey(config('services.stripe.secret'));
 
+                    $order = $this->createOrder($address, 'payment_pending');
+                    $this->createOrderItems($order);
+                    $this->createTransaction($order, 'card');
+                    $this->clearCheckoutSession($order);
+                    $this->updateStockQuantities($order);
 
-                        $order = $this->createOrder($address, 'payment_pending');
-                        $this->createOrderItems($order);
-                        $this->createTransaction($order, 'card');
-                        $this->clearCheckoutSession($order);
-                        Session::put('order_completed', true);
-                        Session::put('completed_order_id', $order->id);
-                        Session::forget('checkout');
-                        Session::forget('pending_order');
+                    Session::put('order_completed', true);
+                    Session::put('completed_order_id', $order->id);
+                    Session::forget('checkout');
+                    Session::forget('pending_order');
 
-                        $paymentIntent = PaymentIntent::create([
-                            'amount' => intval($checkout['total'] * 100),
-                            'currency' => 'usd',
-                            'metadata' => [
-                                'order_id' => $order->id,
-                                'user_id' => $user_id,
-                            ],
-                            'automatic_payment_methods' => ['enabled' => true],
-                        ]);
+                    $paymentIntent = PaymentIntent::create([
+                        'amount' => intval($checkout['total'] * 100),
+                        'currency' => 'usd',
+                        'metadata' => [
+                            'order_id' => $order->id,
+                            'user_id' => $user_id,
+                        ],
+                        'automatic_payment_methods' => ['enabled' => true],
+                    ]);
 
-                        return redirect()->route('checkout.order.confirmation');
+                    return redirect()->route('checkout.order.confirmation');
 
-
-                    } catch (ApiErrorException $e) {
-                        return response()->json([
-                            'status' => 'error',
-                            'message' => $e->getMessage(),
-                        ], 500);
-                    }
-                    break;
+                } catch (ApiErrorException $e) {
+                    return response()->json([
+                        'status' => 'error',
+                        'message' => $e->getMessage(),
+                    ], 500);
+                }
 
             case 'cod':
-            $order = $this->createOrder($address);
-            $this->createOrderItems($order);
-            $this->createTransaction($order, 'cod');
-            $this->clearCheckoutSession($order);
+                $order = $this->createOrder($address);
+                $this->createOrderItems($order);
+                $this->createTransaction($order, 'cod');
+                $this->clearCheckoutSession($order);
+                $this->updateStockQuantities($order);
 
-            Session::put('order_completed', true);
+                Session::put('order_completed', true);
+                Session::put('completed_order_id', $order->id);
 
-            return redirect()->route('checkout.order.confirmation');
-
+                return redirect()->route('checkout.order.confirmation');
         }
+
         return redirect()->route('checkout.process.card')->with('error', 'Invalid payment mode selected.');
     }
 
@@ -215,29 +216,35 @@ class CheckoutController extends Controller
         }
     }
 
-    public function order_confirmation()
+    protected function updateStockQuantities($order)
     {
-        if (!Session::has('order_completed')) {
-            return redirect()->route('cart.index')->with('error', 'Order not found or already completed.');
+        try {
+            DB::beginTransaction();
+
+            foreach ($order->orderItems as $item) {
+                $product = $item->product;
+                if ($product) {
+                    if ($product->quantity < $item->quantity) {
+                        throw new \Exception("Insufficient stock for product {$product->name}");
+                    }
+                    $product->decrement('quantity', $item->quantity);
+
+                    StockMovement::create([
+                        'product_id' => $product->id,
+                        'quantity' => -$item->quantity,
+                        'type' => 'order',
+                        'reference_id' => $order->id,
+                        'notes' => "Order #{$order->id}"
+                    ]);
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-
-        $orderId = Session::get('completed_order_id') ?? Session::get('order_id');
-
-        if (!$orderId) {
-            return redirect()->route('cart.index')->with('error', 'Order ID missing.');
-        }
-
-        $order = Order::with('transactions')->find($orderId);
-
-        if (!$order) {
-            return redirect()->route('cart.index')->with('error', 'Order not found.');
-        }
-
-        $transaction = $order->transactions()->where('status', ['completed', 'pending'])->latest()->first();
-
-        return view('frontend.checkout.order-confirmation', compact('order', 'transaction'));
     }
-
 
     public function showCardPaymentForm()
     {
@@ -293,8 +300,6 @@ class CheckoutController extends Controller
         }
     }
 
-
-
     /**
      * Stripe webhook (for async payment confirmation).
      */
@@ -327,5 +332,27 @@ class CheckoutController extends Controller
         return response('Webhook handled', 200);
     }
 
+    public function order_confirmation()
+    {
+        if (!Session::has('order_completed')) {
+            return redirect()->route('cart.index')->with('error', 'Order not found or already completed.');
+        }
+
+        $orderId = Session::get('completed_order_id') ?? Session::get('order_id');
+
+        if (!$orderId) {
+            return redirect()->route('cart.index')->with('error', 'Order ID missing.');
+        }
+
+        $order = Order::with('transactions')->find($orderId);
+
+        if (!$order) {
+            return redirect()->route('cart.index')->with('error', 'Order not found.');
+        }
+
+        $transaction = $order->transactions()->latest()->first();
+
+        return view('frontend.checkout.order-confirmation', compact('order', 'transaction'));
+    }
 
 }

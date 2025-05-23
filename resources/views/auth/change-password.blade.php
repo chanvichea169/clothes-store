@@ -428,7 +428,6 @@
             <form action="{{ route('user.update.password') }}" method="POST" class="login-form">
                 @csrf
                 @method('PUT')
-
                 @error('email')
                     <div class="text-sm text-red-500 mt-1">{{ $message }}</div>
                 @enderror

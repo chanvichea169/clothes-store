@@ -45,7 +45,7 @@
             </div>
             <div class="table-responsive">
                 @if(Session::has('status'))
-                    <p class="alert alert-success">{{ Session::get('status') }}</p>
+                    <p class="alert" style="font-size: 20px; color: white; background: rgb(2, 178, 75);">{{ Session::get('status') }}</p>
                 @endif
                 <table class="table table-striped table-bordered">
                     <tr>
@@ -67,15 +67,17 @@
                         <th>Order Status</th>
                         <td>
                             @if($order->status == 'delivered')
-                                <span class="badge bg-success">Delivered</span>
+                                <p class="badge bg-success" style="font-size: 14px;">Delivered</p>
                             @elseif($order->status == 'canceled')
-                                <span class="badge bg-danger">Canceled</span>
+                                <p class="badge bg-danger" style="font-size: 14px;">Canceled</p>
                             @elseif($order->status == 'shipped')
-                                <span class="badge bg-info">Shipped</span>
+                                <p class="badge bg-info" style="font-size: 14px;">Shipped</p>
                             @elseif($order->status == 'processing')
-                                <span class="badge bg-primary">Processing</span>
+                                <p class="badge bg-primary" style="font-size: 14px;">Processing</p>
+                            @elseif($order->status == 'refunded')
+                                <p class="badge bg-warning" style="font-size: 14px;">Refunded</p>
                             @else
-                                <span class="badge bg-warning">Ordered</span>
+                                <p class="badge bg-warning" style="font-size: 14px;">Ordered</p>
                             @endif
                         </td>
                     </tr>
@@ -152,17 +154,17 @@
         </div>
 
         <div class="wg-box mt-5">
-            <h5>Shipping Address</h5>
+            <h5>📦 Shipping Address</h5>
             <div class="my-account__address-item col-md-6">
                 <div class="my-account__address-item__detail">
-                        <p>{{ $order->name }}</p>
-                        <p>{{ $order->address }}</p>
-                        <p>{{ $order->locality }}</p>
-                        <p>{{ $order->city }}</p>
-                        <p>{{ $order->landkmark }}</p>
-                        <p>{{ $order->zip }}</p>
-                        <br>
-                        <p>Mobile : {{ $order->phone }}</p>
+                    <p>👤 {{ $order->name }}</p>
+                    <p>🏠 {{ $order->address }}</p>
+                    <p>{{ $order->locality }}</p>
+                    <p>🏙️ {{ $order->city }}</p>
+                    <p>{{ $order->landkmark }}</p>
+                    <p>📮 {{ $order->zip }}</p>
+                    <br>
+                    <p>📞 Mobile: {{ $order->phone }}</p>
                 </div>
             </div>
         </div>
@@ -187,13 +189,13 @@
                         <th>Status</th>
                         <td>
                             @if($transaction->status == 'approved')
-                                <span class="badge bg-success">Approved</span>
+                                <span class="badge bg-success" style="font-size: 14px;">Approved</span>
                             @elseif($transaction->status == 'refunded')
-                                <span class="badge badge-warning">Refunded</span>
+                                <span class="badge badge-warning" style="font-size: 14px;">Refunded</span>
                             @elseif($transaction->status == 'declined')
-                                <span class="badge badge-danger">Declined</span>
+                                <span class="badge badge-danger" style="font-size: 14px;">Declined</span>
                             @else
-                                <span class="badge bg-warning">Pending</span>
+                                <span class="badge bg-warning" style="font-size: 14px;">Pending</span>
                             @endif
                         </td>
                     </tr>
@@ -210,9 +212,12 @@
                     <div class="col-md-3">
                         <div class="select">
                             <select name="order_status" id="order_status">
-                                <option value="ordered" {{ $order->status == 'ordered' ? "selected":"" }}>Ordered</option>
-                                <option value="delivered" {{ $order->status == 'delivered' ? "delivered":"" }}>Delivered</option>
-                                <option value="canceled" {{ $order->status == 'canceled' ? "canceled":"" }}>Canceled</option>
+                                <option value="ordered" {{ $order->status == 'ordered' ? "selected":"" }}>🛒 Ordered</option>
+                                <option value="processing" {{ $order->status == 'processing' ? "selected":"" }}>⏳ Processing</option>
+                                <option value="shipped" {{ $order->status == 'shipped' ? "selected":"" }}>📦 Shipped</option>
+                                <option value="delivered" {{ $order->status == 'delivered' ? "selected":"" }}>✅ Delivered</option>
+                                <option value="canceled" {{ $order->status == 'canceled' ? "selected":"" }}>❌ Canceled</option>
+                                <option value="refunded" {{ $order->status == 'refunded' ? "selected":"" }}>💸 Refunded</option>
                             </select>
                         </div>
                     </div>
@@ -225,3 +230,4 @@
     </div>
 </div>
 @endsection
+

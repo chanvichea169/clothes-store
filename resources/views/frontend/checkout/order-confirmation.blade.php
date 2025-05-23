@@ -56,7 +56,7 @@
                     <label>Payment Method</label>
                     <span>
                         @php
-                            $paymentMethod = $order->transactions->last()?->mode;
+                            $paymentMethod = $transaction->mode ?? $order->payment_method ?? 'N/A';
                         @endphp
 
                         @switch($paymentMethod)
@@ -67,7 +67,7 @@
                                 Cash on Delivery
                                 @break
                             @default
-                                {{ ucfirst($paymentMethod ?? 'N/A') }}
+                                {{ ucfirst($paymentMethod) }}
                         @endswitch
                     </span>
                 </div>

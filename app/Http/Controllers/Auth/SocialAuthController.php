@@ -28,14 +28,14 @@ class SocialAuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
 
-            // Check if user already exists
             $userData = User::where('email', $googleUser->email)->first();
 
             if ($userData) {
 
-                Auth::login($userData, true);
-                return redirect('/'); // Log in the user if they exist
-
+                Auth::login($userData, true);return redirect()->intended('/')->with([
+                    'message' => 'Login Successful! Welcome back, ' . Auth::user()->name . '!',
+                    'message_type' => 'success',
+                ]);
             } else {
                 $userData = User::create([
                     'name' => $googleUser->name,

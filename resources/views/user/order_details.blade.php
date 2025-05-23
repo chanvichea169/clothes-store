@@ -289,15 +289,15 @@
                         </tbody>
                     </table>
                 </div>
-                @if($order->status == 'ordered')
-                <div class="wg-box mt-5 text-right">
-                    <form action="{{ route('user.order.cancel', $order->id) }}" method="POST">
-                        @csrf
-                        @method('PUT')
-                        <input type="hidden" name="order_id" value="{{ $order->id }}">
-                        <button type="button" class="btn btn-md text-white cancel-order" style="background-color: #dc3545">Cancel Order</button>
-                    </form>
-                </div>
+                @if($order->status == 'ordered' && !in_array( $transaction->mode, ['card', 'paypal']))
+                    <div class="wg-box mt-5 text-right">
+                        <form action="{{ route('user.order.cancel', $order->id) }}" method="POST">
+                            @csrf
+                            @method('PUT')
+                            <input type="hidden" name="order_id" value="{{ $order->id }}">
+                            <button type="button" class="btn btn-md text-white cancel-order" style="background-color: #dc3545">Cancel Order</button>
+                        </form>
+                    </div>
                 @endif
             </div>
         </div>

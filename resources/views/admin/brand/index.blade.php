@@ -50,8 +50,11 @@
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
                     @if(Session::has('success'))
-                    <div class="alert alert-success">{{ Session::get('success') }}</div>
-                @endif
+                        <div class="alert" style="font-size: 20px; color: white; background: rgb(2, 178, 75);">{{ Session::get('success') }}</div>
+                    @endif
+                    @if(Session::has('message'))
+                        <div class="alert" style="font-size: 20px; color: white; background: rgb(246, 71, 109);">{{ Session::get('message') }}</div>
+                    @endif
                     <table class="table table-striped table-bordered">
                         <thead>
                             <tr>
@@ -63,9 +66,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($brands as $brand)
+                            @foreach($brands as $key => $brand)
                                 <tr>
-                                    <td>{{ $brand->id }}</td>
+                                    <td>{{ $key + 1 }}</td>
                                     <td class="pname">
                                         <div class="image">
                                             <img src="{{ asset('uploads/brands/' . $brand->logo) }}" alt="{{ $brand->name }}" class="image">
@@ -76,7 +79,7 @@
                                     </td>
                                     <td>{{ $brand->slug }}</td>
                                     <td><a href="#" target="_blank">0</a></td>
-                                    <td>
+                                    <th>
                                         <div class="list-icon-function">
 
                                             <a href="{{ route('admin.edit.brand', $brand->id) }}">
@@ -92,7 +95,7 @@
                                                 </div>
                                             </form>
                                         </div>
-                                    </td>
+                                    </th>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -52,10 +52,10 @@
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
                     @if(Session::has('success'))
-                        <p class="alert alert-success">{{ Session::get('success') }}</p>
+                        <p class="alert" style="font-size: 18px; background:rgb(2, 159, 67); color: white;">{{ Session::get('success') }}</p>
                     @endif
                     @if(Session::has('message'))
-                        <p class="alert alert-danger">{{ Session::get('message') }}</p>
+                        <p class="alert alert-danger" style="font-size: 18px; background:rgba(242, 1, 69, 0.926); color: white">{{ Session::get('message') }}</p>
                     @endif
                     <table class="table table-striped table-bordered">
                         <thead>
@@ -70,9 +70,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($coupons as $coupon)
+                            @foreach ($coupons as $key => $coupon)
                             <tr>
-                                <td>{{ $coupon->id }}</td>
+                                <td>{{ $key + 1 }}</td>
                                 <td>{{ $coupon->code }}</td>
                                 <td>{{ $coupon->type }}</td>
                                 <td>{{ $coupon->value }}</td>

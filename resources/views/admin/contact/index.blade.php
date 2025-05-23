@@ -49,7 +49,7 @@
             <div class="wg-table table-all-user">
                 <div class="table-responsive">
                     @if(Session::has('success'))
-                        <p class="alert alert-success">{{ Session::get('success') }}</p>
+                        <div class="alert alert-success" style="font-size: 18px; color:green;">{{ Session::get('success') }}</div>
                     @endif
                     @if(Session::has('message'))
                         <p class="alert alert-danger">{{ Session::get('message') }}</p>
@@ -67,9 +67,9 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach ($contacts as $contact)
+                            @foreach ($contacts as $key => $contact)
                             <tr>
-                                <td>{{ $contact->id }}</td>
+                                <td>{{ $ckey + 1 }}</td>
                                 <td>{{ $contact->name }}</td>
                                 <td>{{ $contact->phone }}</td>
                                 <td>{{ $contact->email }}</td>

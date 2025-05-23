@@ -49,7 +49,7 @@
             </div>
             <div class="table-responsive">
                 @if(Session::has('success'))
-                    <div class="alert alert-success" style="font-size:18px; color:green;">{{ Session::get('success') }}</div>
+                    <p class="alert" style="font-size:18px; color:rgb(255, 255, 255); background: rgb(1, 181, 82)">{{ Session::get('success') }}</p>
                 @endif
                 <table class="table table-striped table-bordered">
                     <thead>
@@ -68,17 +68,16 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($products as $product)
+                        @foreach($products as $key => $product)
                         @csrf
                         <tr>
-                            <td>{{ $product->id }}</td>
+                            <td>{{ $key + 1 }}</td>
                             <td class="pname">
                                 <div class="image">
                                     <img src="{{ asset('uploads/products/' . $product->image) }}" alt="{{ $product->name }}" class="image">
                                 </div>
                                 <div class="name">
                                     <a href="#" class="body-title-2">{{ $product->name }}</a>
-                                    {{-- <div class="text-tiny mt-3">{{ $product->name }}</div> --}}
                                 </div>
                             </td>
                             <td>{{ $product->price }}</td>

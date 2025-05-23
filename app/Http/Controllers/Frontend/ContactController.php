@@ -21,7 +21,7 @@ class ContactController extends Controller
         'message' => 'required',
     ]);
 
-    // Store in Laravel Database
+
     $contact = new Contact();
     $contact->name = $request->name;
     $contact->email = $request->email;

@@ -10,9 +10,14 @@
     <title>Clothes_Shop @yield('title')</title>
     <meta http-equiv="content-type" content="text/html; charset=utf-8" />
     <meta name="author" content="Vichea Cassano" />
+
     @include('frontend.layouts.style')
+
 </head>
 <body class="gradient-bg">
+
+    @include('components.loading')
+
     @include('frontend.layouts.header')
 
     @yield('content')
@@ -22,6 +27,5 @@
     @include('frontend.layouts.script')
 
     @stack('scripts')
-    </body>
+</body>
 </html>
-

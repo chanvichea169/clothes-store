@@ -94,7 +94,7 @@ class BrandController extends Controller
             File::delete(public_path('uploads/brands/'.$brand->logo));
         }
         $brand->delete();
-        return redirect()->route('admin.brands')->with('success', 'Brand deleted successfully');
+        return redirect()->route('admin.brands')->with('message', 'Brand deleted successfully');
     }
 
     public function GenerateBrandThumbnailImage($logo, $logo_name)

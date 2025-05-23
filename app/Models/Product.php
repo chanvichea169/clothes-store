@@ -36,4 +36,23 @@ class Product extends Model
     {
         return $this->belongsTo(Brand::class);
     }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+    public function recordStockMovement($quantity, $type, $referenceId, $notes = null)
+    {
+        return StockMovement::create([
+            'product_id' => $this->id,
+            'quantity' => $quantity,
+            'type' => $type,
+            'reference_id' => $referenceId,
+            'notes' => $notes
+        ]);
+    }
+
+    public function getStockHistory()
+    {
+        return $this->hasMany(StockMovement::class)->latest();
+    }
 }

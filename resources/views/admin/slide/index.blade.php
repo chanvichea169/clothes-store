@@ -51,7 +51,7 @@
             </div>
             <div class="wg-table table-all-user">
                 @if(Session::has('success'))
-                <div class="alert alert-success" style="font-size: 18px; color:green;">{{ Session::get('success') }}</div>
+                    <div class="alert alert-success" style="font-size: 18px; color:green;">{{ Session::get('success') }}</div>
                  @endif
                 <table class="table table-striped table-bordered table-responsive">
                     <thead>
@@ -66,9 +66,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($slides as $slide)
+                        @foreach($slides as $key => $slide)
                         <tr>
-                            <td>{{ $slide->id }}</td>
+                            <td>{{ $key + 1 }}</td>
                             <td class="pname">
                                 <div class="image">
                                     <img src="{{ asset('uploads/slides') }}/{{ $slide->image }}" alt="" class="image">

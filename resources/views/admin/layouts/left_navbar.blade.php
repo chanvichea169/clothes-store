@@ -103,6 +103,12 @@
                         <div class="text">Slider</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="{{ route('admin.category-banners.index') }}" class="{{ request()->routeIs('admin.category-banners.index') ? 'active' : '' }}">
+                        <div class="icon"><i class="icon-image"></i></div>
+                        <div class="text">Banner</div>
+                    </a>
+                </li>
 
                 <li class="menu-item">
                     <a href="{{ route('admin.coupons') }}" class="{{ request()->routeIs('admin.coupons') ? 'active' : '' }}">
@@ -119,27 +125,39 @@
                 </li>
 
                 <li class="menu-item">
-                    <a href="{{ route('admin.user.index') }}" class="{{ request()->routeIs('users') ? 'active' : '' }}">
+                    <a href="{{ route('admin.user.index') }}" class="{{ request()->routeIs('admin.user.index') ? 'active' : '' }}">
                         <div class="icon"><i class="icon-user"></i></div>
                         <div class="text">User</div>
                     </a>
                 </li>
 
                 <li class="menu-item">
-                    <a href="{{ route('admin.setting.index') }}" class="{{ request()->routeIs('settings.index') ? 'active' : '' }}">
+                    <a href="{{ route('admin.setting.index') }}" class="{{ request()->routeIs('admin.setting.index') ? 'active' : '' }}">
                         <div class="icon"><i class="icon-settings"></i></div>
                         <div class="text">Settings</div>
                     </a>
                 </li>
+                <li class="menu-item">
+                    <a href="{{ route('admin.about.index') }}" class="{{ request()->routeIs('admin.about.index') ? 'active' : '' }}">
+                        <span class="material-symbols-rounded">
+                            info
+                        </span>
+                        <div class="text">About</div>
+                    </a>
+                </li>
 
                 <li class="menu-item">
-                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                    {{-- <form method="POST" action="{{ route('logout') }}" id="logout-form">
                         @csrf
                         <a href="{{ route('logout') }}" class="" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                             <div class="icon me-2"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
                             <div class="text">Logout</div>
                         </a>
-                    </form>
+                    </form> --}}
+                    <a href="{{ route('home.index') }}" >
+                        <div class="icon me-2"><i class="fa-solid fa-arrow-right-from-bracket"></i></div>
+                        <div class="text">Logout</div>
+                    </a>
                 </li>
             </ul>
         </div>

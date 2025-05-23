@@ -19,6 +19,7 @@ class CategoryController extends Controller
         return view('admin.category.index', compact('categories'));
     }
 
+
     public function add_category()
     {
         return view('admin.category.add-category');
@@ -31,6 +32,10 @@ class CategoryController extends Controller
             'slug' => 'required|unique:categories,slug',
             'image' => 'mimes:jpeg,png,jpg,svg|max:2048',
         ]);
+
+        if (Category::where('name', $request->name)->exists()) {
+            return redirect()->back()->with('error', 'Category name already exists.');
+        }
 
         $category = new Category();
         $category->name = $request->name;
@@ -51,6 +56,7 @@ class CategoryController extends Controller
         return redirect()->route('admin.categories')->with('success', 'Category added successfully');
     }
 
+
     public function edit_category($slug)
     {
         $category = Category::where('slug', $slug)->firstOrFail();
@@ -65,7 +71,11 @@ class CategoryController extends Controller
             'image' => 'mimes:jpeg,png,jpg,svg|max:2048',
         ]);
 
-        $category = Category::findOrFail($request->id); // You should still find by ID if you are updating using the ID from the form.
+        if (Category::where('name', $request->name)->where('id', '!=', $request->id)->exists()) {
+            return redirect()->back()->with('error', 'Category name already exists.');
+        }
+
+        $category = Category::findOrFail($request->id);
         $category->name = $request->name;
         $category->slug = Str::slug($request->name);
         $image = $request->file('image');
@@ -81,6 +91,7 @@ class CategoryController extends Controller
                 $category->image = $file_name;
             }
         }
+
         $category->save();
 
         return redirect()->route('admin.categories')->with('success', 'Category updated successfully');

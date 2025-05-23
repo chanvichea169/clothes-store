@@ -46,24 +46,27 @@ class ShopController extends Controller
 
         $categories = Category::orderBy('name', 'asc')->get();
         $brands = Brand::orderBy('name', 'asc')->get();
-
         $colors = Product::select('SKU')->distinct()->get();
 
-        $products = Product::
-                    where(function ($query) use ($f_brands) {
-                        $query->whereIn('brand_id', explode(',', $f_brands))->orWhereRaw("'".$f_brands."'=''");
-                    })->
-                    where(function ($query) use ($f_categories) {
-                        $query->whereIn('category_id', explode(',', $f_categories))->orWhereRaw("'".$f_categories."'=''");
-                    })->
-                    where(function ($query) use ($f_colors) {
-                        $query->whereIn('SKU', explode(',', $f_colors))->orWhereRaw("'".$f_colors."'=''");
-                    })->
-                    where(function ($query) use ($min_price, $max_price) {
+        $products = Product::where('quantity', '>', 0)
+                    ->where(function ($query) use ($f_brands) {
+                        $query->whereIn('brand_id', explode(',', $f_brands))
+                              ->orWhereRaw("'".$f_brands."'=''");
+                    })
+                    ->where(function ($query) use ($f_categories) {
+                        $query->whereIn('category_id', explode(',', $f_categories))
+                              ->orWhereRaw("'".$f_categories."'=''");
+                    })
+                    ->where(function ($query) use ($f_colors) {
+                        $query->whereIn('SKU', explode(',', $f_colors))
+                              ->orWhereRaw("'".$f_colors."'=''");
+                    })
+                    ->where(function ($query) use ($min_price, $max_price) {
                         $query->whereBetween('price', [$min_price, $max_price])
                               ->orWhereBetween('cost', [$min_price, $max_price]);
-                    })->
-                    orderBy($o_column, $o_order)->paginate($size);
+                    })
+                    ->orderBy($o_column, $o_order)
+                    ->paginate($size);
 
         return view('frontend.shop.index', compact('products', 'size', 'order', 'brands', 'f_brands', 'categories', 'f_categories', 'min_price', 'max_price', 'f_colors', 'colors'));
     }

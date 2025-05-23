@@ -21,89 +21,96 @@ class ProductController extends Controller
 
     public function add_product()
     {
-        // Fetch categories
         $categories = Category::select('id', 'name')
             ->orderBy('name', 'asc')
             ->get();
 
-        // Fetch brands
         $brands = Brand::select('id', 'name')
             ->orderBy('name', 'asc')
             ->get();
 
-        // Pass both categories and brands to the view
         return view('admin.product.add-product', compact('categories', 'brands'));
     }
 
-
-
     public function store_product(Request $request)
     {
-        $request->validate([
-            'name' => 'required',
-            'slug' => 'required|unique:products,slug',
-            'description' => 'required',
-            'status' => 'required',
-            'price' => 'required',
-            'cost' => 'required',
-            'SKU' => 'required',
-            'stock_status' => 'required',
-            'featured' => 'required',
-            'quantity' => 'required',
-            'image' => 'required|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'category_id' => 'required',
-            'brand_id' => 'required',
-            'gallery' => 'array',
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'slug' => 'required|unique:products,slug|max:100',
+            'description' => 'required|string',
+            'status' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0.01',
+            'cost' => 'required|numeric|min:0.01',
+            'SKU' => 'required|string|max:50',
+            'stock_status' => 'required|in:instock,outofstock',
+            'featured' => 'required|boolean',
+            'quantity' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'gallery' => 'nullable|array|max:5',
             'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
+        ], [
+            'quantity.min' => 'Quantity must be a positive number or zero.',
+            'price.min' => 'Price must be greater than zero.',
+            'cost.min' => 'Cost must be greater than zero.',
+            'gallery.max' => 'You can upload maximum 5 gallery images.',
+            'image.max' => 'The image must not be greater than 2MB.',
+            'gallery.*.max' => 'Each gallery image must not be greater than 2MB.'
         ]);
 
-        // Create Product
-        $product = new Product();
-        $product->name = $request->name;
-        $product->slug = Str::slug($request->name);
-        $product->description = $request->description;
-        $product->status = $request->status;
-        $product->price = $request->price;
-        $product->cost = $request->cost;
-        $product->SKU = $request->SKU;
-        $product->stock_status = $request->stock_status;
-        $product->featured = $request->featured;
-        $product->quantity = $request->quantity;
-        $product->category_id = $request->category_id;
-        $product->brand_id = $request->brand_id;
+        try {
+            $product = new Product();
+            $product->name = $validated['name'];
+            $product->slug = Str::slug($validated['name']);
+            $product->description = $validated['description'];
+            $product->status = $validated['status'];
+            $product->price = $validated['price'];
+            $product->cost = $validated['cost'];
+            $product->SKU = $validated['SKU'];
+            $product->stock_status = $validated['stock_status'];
+            $product->featured = $validated['featured'];
+            $product->quantity = $validated['quantity'];
+            $product->category_id = $validated['category_id'];
+            $product->brand_id = $validated['brand_id'];
 
-        $current_timestamp = Carbon::now()->timestamp;
+            $current_timestamp = Carbon::now()->timestamp;
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $imageName = $current_timestamp . '.' . $image->extension();
-            $this->GenerateProductThumbnailImage($image, $imageName);
-            $product->image = $imageName;
-        }
-
-        $gallery_arr = array();
-        $gallery_images = "";
-        $counter = 1;
-
-        if ($request->hasFile('gallery')) {
-            $allowedfileExtension = ['jpg', 'png', 'jpeg', 'gif', 'svg'];
-            $files = $request->file('gallery');
-            foreach ($files as $file) {
-                $gextension = $file->getClientOriginalExtension();
-                $gcheck = in_array($gextension, $allowedfileExtension);
-                if ($gcheck) {
-                    $gfilename = $current_timestamp . "-" . $counter . '.' . $gextension;
-                    $this->GenerateProductThumbnailImage($file, $gfilename);
-                    array_push($gallery_arr, $gfilename);
-                    $counter++;
-                }
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageName = $current_timestamp . '.' . $image->extension();
+                $this->GenerateProductThumbnailImage($image, $imageName);
+                $product->image = $imageName;
             }
-            $gallery_images = implode(',', $gallery_arr);
-        }
-        $product->gallery = $gallery_images;
-        $product->save();
 
-        return redirect()->route('admin.products')->with('success', 'Product added successfully');
+            $gallery_arr = array();
+            $gallery_images = "";
+            $counter = 1;
+
+            if ($request->hasFile('gallery')) {
+                $allowedfileExtension = ['jpg', 'png', 'jpeg', 'gif', 'svg'];
+                $files = $request->file('gallery');
+                foreach ($files as $file) {
+                    $gextension = $file->getClientOriginalExtension();
+                    $gcheck = in_array($gextension, $allowedfileExtension);
+                    if ($gcheck) {
+                        $gfilename = $current_timestamp . "-" . $counter . '.' . $gextension;
+                        $this->GenerateProductThumbnailImage($file, $gfilename);
+                        array_push($gallery_arr, $gfilename);
+                        $counter++;
+                    }
+                }
+                $gallery_images = implode(',', $gallery_arr);
+            }
+            $product->gallery = $gallery_images;
+            $product->save();
+
+            return redirect()->route('admin.products')->with('success', 'Product added successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Product creation failed. ' . $e->getMessage()]);
+        }
     }
 
     public function edit_product($slug)
@@ -127,57 +134,70 @@ class ProductController extends Controller
     {
         $product = Product::where('slug', $slug)->firstOrFail();
 
-        $request->validate([
-            'name' => 'required',
-            'slug' => 'required|unique:products,slug,' . $product->id,
-            'description' => 'required',
-            'status' => 'required',
-            'price' => 'required',
-            'cost' => 'required',
-            'SKU' => 'required',
-            'stock_status' => 'required',
-            'featured' => 'required',
-            'quantity' => 'required',
-            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'gallery' => 'array',
+        $validated = $request->validate([
+            'name' => 'required|string|max:100',
+            'slug' => 'required|unique:products,slug,'.$product->id.'|max:100',
+            'description' => 'required|string',
+            'status' => 'required|string|max:255',
+            'price' => 'required|numeric|min:0.01',
+            'cost' => 'required|numeric|min:0.01',
+            'SKU' => 'required|string|max:50',
+            'stock_status' => 'required|in:instock,outofstock',
+            'featured' => 'required|boolean',
+            'quantity' => 'required|integer|min:0',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'gallery' => 'nullable|array|max:5',
             'gallery.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'category_id' => 'required',
-            'brand_id' => 'required',
+            'category_id' => 'required|exists:categories,id',
+            'brand_id' => 'required|exists:brands,id',
+        ], [
+            'quantity.min' => 'Quantity must be a positive number or zero.',
+            'price.min' => 'Price must be greater than zero.',
+            'cost.min' => 'Cost must be greater than zero.',
+            'gallery.max' => 'You can upload maximum 5 gallery images.',
+            'image.max' => 'The image must not be greater than 2MB.',
+            'gallery.*.max' => 'Each gallery image must not be greater than 2MB.'
         ]);
 
-        $product->name = $request->name;
-        $product->slug = $request->slug;
-        $product->description = $request->description;
-        $product->status = $request->status;
-        $product->price = $request->price;
-        $product->cost = $request->cost;
-        $product->SKU = $request->SKU;
-        $product->stock_status = $request->stock_status;
-        $product->featured = $request->featured;
-        $product->quantity = $request->quantity;
-        $product->category_id = $request->category_id;
-        $product->brand_id = $request->brand_id;
+        try {
+            $product->fill($validated);
 
-        if ($request->hasFile('image')) {
-            $image = $request->file('image');
-            $name = time() . '.' . $image->extension();
-            $this->GenerateProductThumbnailImage($image, $name);
-            $product->image = $name;
-        }
+            $current_timestamp = Carbon::now()->timestamp;
 
-        if ($request->hasFile('gallery')) {
-            $gallery_images = [];
-            foreach ($request->file('gallery') as $file) {
-                $name = time() . '.' . $file->extension();
-                $this->GenerateProductThumbnailImage($file, $name);
-                $gallery_images[] = $name;
+            if ($request->hasFile('image')) {
+                $image = $request->file('image');
+                $imageName = $current_timestamp . '.' . $image->extension();
+                $this->GenerateProductThumbnailImage($image, $imageName);
+                $product->image = $imageName;
             }
-            $product->gallery = implode(',', $gallery_images);
+
+            if ($request->hasFile('gallery')) {
+                $gallery_arr = array();
+                $counter = 1;
+                $allowedfileExtension = ['jpg', 'png', 'jpeg', 'gif', 'svg'];
+                $files = $request->file('gallery');
+
+                foreach ($files as $file) {
+                    $gextension = $file->getClientOriginalExtension();
+                    $gcheck = in_array($gextension, $allowedfileExtension);
+                    if ($gcheck) {
+                        $gfilename = $current_timestamp . "-" . $counter . '.' . $gextension;
+                        $this->GenerateProductThumbnailImage($file, $gfilename);
+                        array_push($gallery_arr, $gfilename);
+                        $counter++;
+                    }
+                }
+                $product->gallery = implode(',', $gallery_arr);
+            }
+
+            $product->save();
+
+            return redirect()->route('admin.products')->with('success', 'Product updated successfully');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Update failed. ' . $e->getMessage()]);
         }
-
-        $product->save();
-
-        return redirect()->route('admin.products')->with('success', 'Product updated successfully');
     }
 
     public function delete_product($slug)
@@ -187,7 +207,6 @@ class ProductController extends Controller
 
         return redirect()->route('admin.products')->with('success', 'Product deleted successfully');
     }
-
 
     public function GenerateProductThumbnailImage($image, $image_name)
     {

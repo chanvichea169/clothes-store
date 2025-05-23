@@ -443,11 +443,11 @@
                             <div class="search-popup__results">
                                 <div class="sub-menu search-suggestion">
                                     <h6 class="sub-menu__title fs-base">Quicklinks</h6>
-                                    @foreach ($categories as $category)
+                                    {{-- @foreach ($categories as $category)
                                         <ul class="sub-menu__list list-unstyled">
                                             <li class="sub-menu__item"><a href="{{ route('shop.index',['category' => $category->slug]) }}" class="menu-link menu-link_us-s">{{ $category->name }}</a></li>
                                         </ul>
-                                    @endforeach
+                                    @endforeach --}}
                                 </div>
                                 <div class="search-result row row-cols-5"></div>
                             </div>
@@ -525,47 +525,113 @@
                         </a>
                     </div>
                 @else
+                <style>
+                    .dropdown-item {
+                        transition: background-color 0.2s ease, transform 0.2s ease;
+                        font-size: 14px;
+                        font-weight: 500;
+                        color: #333;
+                        padding: 0.5rem 1rem;
+                        border-radius: 8px;
+                        margin: 0.15rem 0;
+                    }
+
+                    .dropdown-item:hover {
+                        background-color: #f8f9fa;
+                        transform: scale(1.02);
+                    }
+
+                    .icon-bg {
+                        background-color: #85b4fb;
+                        color: white;
+                        width: 36px;
+                        height: 36px;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        font-size: 18px;
+                        transition: background-color 0.2s ease;
+                    }
+
+                    .dropdown-item:hover .icon-bg {
+                        background-color: #0b5ed7;
+                    }
+
+                    .dropdown-item.text-danger .icon-bg {
+                        background-color: #dc3545;
+                    }
+
+                    .dropdown-item.text-danger:hover .icon-bg {
+                        background-color: #b02a37;
+                    }
+
+                    .dropdown-divider {
+                        margin: 0.rem 0;
+                        border-color: #e9ecef;
+                    }
+
+                    .badge {
+                        font-size: 12px;
+                        font-weight: 500;
+                        padding: 0.25rem 0.5rem;
+                        border-radius: 20px;
+                        background-color: #f8d7da;
+                        color: #721c24;
+                    }
+                </style>
+
                 <div class="header-tools__item dropdown ms-0 mb-2">
-                    <button class="btn dropdown-toggle d-flex align-items-center border-0 bg-transparent p-0 hover-primary focus-primary"
-                            id="userDropdownMenu"
-                            data-bs-toggle="dropdown"
-                            aria-expanded="false">
+                    <button class="btn dropdown-toggle d-flex align-items-center border-0 bg-transparent p-0" id="userDropdownMenu" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="d-flex align-items-center gap-2">
-                            <div class="avatar avatar-sm">
-                                <img src="{{ Auth::user()->avatar ? asset('storage/'.Auth::user()->avatar) : asset('images/avatar/user-1.png') }}"
-                                    alt="{{ Auth::user()->name }}"
-                                    class="rounded-circle">
+                            <div class="avatar avatar-sm rounded-circle overflow-hidden">
+                                <img src="{{ Auth::user()->avatar ? asset('storage/' . Auth::user()->avatar) : asset('images/avatar/user-1.png') }}" alt="{{ Auth::user()->name }}" class="w-100 h-100 object-fit-cover">
                             </div>
-                            <span class="fw-semibold d-none d-md-inline text-dark">{{ ucfirst(Auth::user()->name) }}</span>
+                            <span class="fw-semibold text-dark d-none d-md-inline">{{ ucfirst(Auth::user()->name) }}</span>
                         </div>
                     </button>
 
-                    <ul class="dropdown-menu dropdown-menu-end shadow-sm mt-2 border-0 rounded-3" aria-labelledby="userDropdownMenu">
+                    <ul class="dropdown-menu dropdown-menu-end shadow mt-2 border-0 rounded-3" aria-labelledby="userDropdownMenu">
                         <li>
-                            <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('user.index') }}">
-                                <span class="material-symbols-rounded me-2">person</span> My Account
+                            <a class="dropdown-item d-flex align-items-center gap-3" href="{{ route('user.index') }}">
+                                <span class="material-symbols-rounded icon-bg">person</span> My Account
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('user.orders') }}">
-                                <span class="material-symbols-rounded me-2">shopping_cart</span> My Orders
+                            <a class="dropdown-item d-flex align-items-center gap-3 justify-content-between" href="{{ route('user.orders') }}">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="material-symbols-rounded icon-bg">shopping_basket</span> My Orders
+                                </div>
+                                @if (Cart::instance('order')->content()->count() > 0)
+                                    <span class="badge">{{ Cart::instance('order')->content()->count() }}</span>
+                                @endif
                             </a>
                         </li>
                         <li>
-                            <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('user.change.password') }}">
-                                <span class="material-symbols-rounded me-2">lock</span> Change Password
+                            <a class="dropdown-item d-flex align-items-center gap-3" href="{{ route('user.change.password') }}">
+                                <span class="material-symbols-rounded icon-bg">lock</span> Change Password
                             </a>
                         </li>
 
                         <li><hr class="dropdown-divider"></li>
 
                         <li>
-                            <a class="dropdown-item d-flex justify-content-between align-items-center py-2 px-3 hover-bg-light" href="{{ route('wishlist.index') }}">
-                                <div class="d-flex align-items-center">
-                                    <span class="material-symbols-rounded me-2">favorite</span> Wishlist
+                            <a class="dropdown-item d-flex align-items-center gap-3 justify-content-between" href="{{ route('cart.index') }}">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="material-symbols-rounded icon-bg">shopping_cart</span> Cart
                                 </div>
-                                @if(Cart::instance('wishlist')->content()->count() > 0)
-                                    <span class="badge bg-primary rounded-pill">{{ Cart::instance('wishlist')->content()->count() }}</span>
+                                @if (Cart::instance('cart')->content()->count() > 0)
+                                    <span class="badge text-primary">{{ Cart::instance('cart')->content()->count() }}</span>
+                                @endif
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center gap-3 justify-content-between" href="{{ route('wishlist.index') }}">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="material-symbols-rounded icon-bg">favorite</span> Wishlist
+                                </div>
+                                @if (Cart::instance('wishlist')->content()->count() > 0)
+                                    <span class="badge">{{ Cart::instance('wishlist')->content()->count() }}</span>
                                 @endif
                             </a>
                         </li>
@@ -573,8 +639,8 @@
                         @if(Auth::user()->utype === 'ADM')
                             <li><hr class="dropdown-divider"></li>
                             <li>
-                                <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light" href="{{ route('admin.index') }}">
-                                    <span class="material-symbols-rounded me-2">dashboard</span> Admin Dashboard
+                                <a class="dropdown-item d-flex align-items-center gap-3" href="{{ route('admin.index') }}">
+                                    <span class="material-symbols-rounded icon-bg">dashboard</span> Admin Dashboard
                                 </a>
                             </li>
                         @endif
@@ -582,17 +648,13 @@
                         <li><hr class="dropdown-divider"></li>
 
                         <li>
-                            <a class="dropdown-item d-flex align-items-center py-2 px-3 hover-bg-light hover-text-danger" href="{{ route('logout') }}"
-                               onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <span class="material-symbols-rounded me-2">logout</span> Logout
+                            <a class="dropdown-item d-flex align-items-center gap-3 text-danger" href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
+                                <span class="material-symbols-rounded icon-bg bg-danger" style="color:#fbf8f8;">logout</span> <span style="color:#dc3545">Logout</span>
                             </a>
-                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
-                                @csrf
-                            </form>
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">@csrf</form>
                         </li>
                     </ul>
                 </div>
-
                 @endguest
             </div>
         </div>

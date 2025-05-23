@@ -59,13 +59,14 @@
                     </div>
                     </td>
                     <td>
-                    <div class="shopping-cart__product-item__detail">
-                        <h4>{{ $item->name }}</h4>
-                        <ul class="shopping-cart__product-item__options">
-                        <li>Color: Yellow</li>
-                        <li>Size: L</li>
-                        </ul>
-                    </div>
+                        <div class="shopping-cart__product-item__detail">
+                            <h4>{{ $item->name }}</h4>
+                            <ul class="shopping-cart__product-item__options">
+                                <li>Color: {{ ucfirst($item->model->SKU ?? 'N/A') }}</li>
+                                <li>Description: {{ ucfirst($item->model->description ?? 'N/A') }}</li>
+                                <li>Size: {{ ucfirst($item->model->size ?? 'M') }}</li>
+                            </ul>
+                        </div>
                     </td>
                     <td>
                     <span class="shopping-cart__product-price">${{ $item->price }}</span>
