@@ -66,7 +66,7 @@
                                 <td class="text-center"><a href="{{ route('order.index',$user->id) }}" target="_blank">{{ $user->orders_count }}</a></td>
                                 <td>
                                     <div class="list-icon-function">
-                                        <a href="#" data-toggle="modal" data-target="#editUserModal"
+                                        <a href="{{ route('admin.user.edit', $user->id) }}" data-toggle="modal" data-target="#editUserModal"
                                            onclick="editUser({{ $user->id }}, '{{ $user->name }}', '{{ $user->email }}', '{{ $user->mobile }}')">
                                             <div class="item edit">
                                                 <i class="icon-edit-3"></i>

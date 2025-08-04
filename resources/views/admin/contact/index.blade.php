@@ -69,7 +69,7 @@
                         <tbody>
                             @foreach ($contacts as $key => $contact)
                             <tr>
-                                <td>{{ $ckey + 1 }}</td>
+                                <td>{{ $key + 1 }}</td>
                                 <td>{{ $contact->name }}</td>
                                 <td>{{ $contact->phone }}</td>
                                 <td>{{ $contact->email }}</td>

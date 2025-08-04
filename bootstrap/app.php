@@ -18,7 +18,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->renderable(function (Throwable $e) {
             if ($e instanceof NotFoundHttpException) {
                 return response()->view('errors.404', [], 404);
+            }elseif ($e instanceof \Illuminate\Database\Eloquent\ModelNotFoundException) {
+                return response()->view('errors.500', [], 500);
+            }elseif ($e instanceof \Illuminate\Auth\Access\AuthorizationException) {
+                return response()->view('errors.403', [], 403);
+            } elseif ($e instanceof \Illuminate\Validation\ValidationException) {
+                return response()->view('errors.422', [], 422);
             }
-            return response()->view('errors.500', [], 500);
+            return redirect('/login')
+               ->with('message', 'Please log in or register to continue.');
         });
 })->create();
